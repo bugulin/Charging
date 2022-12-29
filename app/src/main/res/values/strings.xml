@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Charging</string>
+    <string name="charging">Charging</string>
+    <string name="percentage">%s\u200a%%</string>
+    <string name="title">Battery status</string>
+    <string name="history">Charging history</string>
+    <string name="settings">Settings</string>
 </resources>
