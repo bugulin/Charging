@@ -2,7 +2,7 @@
     <string name="app_name">Charging</string>
     <string name="charging">Charging</string>
     <string name="history">Charging history</string>
-    <string name="title">Battery status</string>
+    <string name="battery_status">Battery status</string>
     <string name="settings">Settings</string>
 
     <string name="duration">in %s</string>
@@ -12,4 +12,5 @@
     <string name="timeMinutes">%d\u2009m</string>
     <string name="timeSeconds">%d\u2009s</string>
     <string name="to">to</string>
+    <string name="back">Go back</string>
 </resources>
