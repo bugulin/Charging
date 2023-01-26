@@ -18,7 +18,7 @@ import cz.bornasp.charging.ui.theme.ChargingTheme
 @Composable
 fun BatteryStatus(
     percentage: Int,
-    isCharging: Boolean,
+    isPluggedIn: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -37,7 +37,7 @@ fun BatteryStatus(
                 .height(64.dp)
                 .padding(16.dp)
         ) {
-            if (isCharging) {
+            if (isPluggedIn) {
                 Icon(
                     imageVector = AppIcons.Bolt,
                     contentDescription = stringResource(R.string.charging),
@@ -53,6 +53,6 @@ fun BatteryStatus(
 @Composable
 fun BatteryStatusPreview() {
     ChargingTheme {
-        BatteryStatus(percentage = 20, isCharging = true)
+        BatteryStatus(percentage = 20, isPluggedIn = true)
     }
 }
