@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Charging</string>
+    <string name="service_channel_name">Foreground service</string>
+    <string name="service_channel_description">Show notification that the foreground service is running.</string>
 </resources>
