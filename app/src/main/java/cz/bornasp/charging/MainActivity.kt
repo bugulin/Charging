@@ -1,5 +1,6 @@
 package cz.bornasp.charging
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +16,12 @@ import cz.bornasp.charging.ui.theme.ChargingTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Start charge monitoring service
+        Intent(this, ChargeMonitor::class.java).also { intent ->
+            applicationContext.startForegroundService(intent)
+        }
+
         setContent {
             ChargingTheme {
                 // A surface container using the 'background' color from the theme

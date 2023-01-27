@@ -13,4 +13,7 @@
     <string name="timeSeconds">%d\u2009s</string>
     <string name="to">to</string>
     <string name="back">Go back</string>
+
+    <string name="service_channel_name">Foreground service</string>
+    <string name="service_channel_description">Show notification that the foreground service is running.</string>
 </resources>
