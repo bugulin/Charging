@@ -11,6 +11,13 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.IBinder
 import android.util.Log
+import cz.bornasp.charging.data.AppDataContainer
+import cz.bornasp.charging.data.BatteryChargingSession
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.time.OffsetDateTime
 
 private const val TAG = "ChargeMonitor"
 private const val SERVICE_NOTIFICATION_CHANNEL = "charge-monitor"
@@ -87,6 +94,49 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
             level * 100 / scale.toFloat()
         }
 
+        runBlocking {
+            launch {
+                when (intent.action) {
+                    Intent.ACTION_POWER_CONNECTED -> createSession(context, batteryPercentage)
+                    Intent.ACTION_POWER_DISCONNECTED -> endSession(context, batteryPercentage)
+                }
+            }
+        }
         Log.d(TAG, "Action: ${intent.action} ($batteryPercentage%}")
+    }
+
+    private suspend fun createSession(context: Context, batteryPercentage: Float?) {
+        val repository = AppDataContainer(context).batteryChargingSessionRepository
+        withContext(Dispatchers.IO) {
+            repository.insertRecord(
+                BatteryChargingSession(
+                    startTime = OffsetDateTime.now(),
+                    initialChargePercentage = batteryPercentage
+                )
+            )
+        }
+    }
+
+    private suspend fun endSession(context: Context, batteryPercentage: Float?) {
+        val repository = AppDataContainer(context).batteryChargingSessionRepository
+        withContext(Dispatchers.IO) {
+            val session = repository.getLastRecordStream()
+            if (session == null || session.endTime != null) {
+                // We missed current session's start
+                repository.insertRecord(
+                    BatteryChargingSession(
+                        endTime = OffsetDateTime.now(),
+                        finalChargePercentage = batteryPercentage
+                    )
+                )
+            } else {
+                repository.updateRecord(
+                    session.copy(
+                        endTime = OffsetDateTime.now(),
+                        finalChargePercentage = batteryPercentage
+                    )
+                )
+            }
+        }
     }
 }
