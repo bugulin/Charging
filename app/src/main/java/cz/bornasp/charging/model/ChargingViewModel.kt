@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class ChargingViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(ChargingUiState(0, false))
+    private val _uiState = MutableStateFlow(ChargingUiState(0F, false))
     val uiState: StateFlow<ChargingUiState> = _uiState.asStateFlow()
 
     /**
@@ -23,13 +23,13 @@ class ChargingViewModel : ViewModel() {
             level * 100 / scale.toFloat()
         }
         _uiState.value = ChargingUiState(
-            batteryPercentage = batteryPercentage?.toInt() ?: -1,
+            batteryPercentage = batteryPercentage ?: 0F,
             isPluggedIn = chargePlug != 0
         )
     }
 }
 
 data class ChargingUiState(
-    val batteryPercentage: Int,
+    val batteryPercentage: Float,
     val isPluggedIn: Boolean
 )

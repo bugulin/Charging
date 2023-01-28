@@ -17,7 +17,7 @@ import cz.bornasp.charging.ui.theme.ChargingTheme
 
 @Composable
 fun BatteryStatus(
-    percentage: Int,
+    percentage: Float,
     isPluggedIn: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -53,6 +53,6 @@ fun BatteryStatus(
 @Composable
 fun BatteryStatusPreview() {
     ChargingTheme {
-        BatteryStatus(percentage = 20, isPluggedIn = true)
+        BatteryStatus(percentage = 20F, isPluggedIn = true)
     }
 }

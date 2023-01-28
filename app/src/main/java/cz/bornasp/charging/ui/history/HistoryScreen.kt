@@ -78,14 +78,12 @@ fun RecordCard(record: BatteryChargingSession, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 FromToText(
-                    from = stringResource(
-                        R.string.percentage,
-                        record.initialChargePercentage?.toString() ?: "?"
-                    ),
-                    to = stringResource(
-                        R.string.percentage,
-                        record.finalChargePercentage?.toString() ?: "?"
-                    ),
+                    from = if (record.initialChargePercentage != null)
+                        stringResource(R.string.percentage, record.initialChargePercentage)
+                    else "?",
+                    to = if (record.finalChargePercentage != null)
+                        stringResource(R.string.percentage, record.finalChargePercentage)
+                    else "?",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(end = 8.dp)
                 )
