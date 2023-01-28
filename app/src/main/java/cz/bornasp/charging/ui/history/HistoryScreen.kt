@@ -1,4 +1,4 @@
-package cz.bornasp.charging.ui
+package cz.bornasp.charging.ui.history
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -7,9 +7,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -18,33 +22,48 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.bornasp.charging.R
-import cz.bornasp.charging.model.ChargeRecord
+import cz.bornasp.charging.data.BatteryChargingSession
+import cz.bornasp.charging.ui.AppViewModelProvider
 import cz.bornasp.charging.ui.theme.AppIcons
 import cz.bornasp.charging.ui.theme.Green
 import cz.bornasp.charging.ui.theme.dark_Green
 import java.time.Duration
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun History(records: List<ChargeRecord>, modifier: Modifier = Modifier) {
+fun HistoryScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HistoryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    val historyUiState by viewModel.historyUiState.collectAsState()
     Column(modifier = modifier.padding(8.dp)) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(records) { record ->
-                RecordCard(record)
-            }
-        }
+        BatteryChargingSessionList(sessionList = historyUiState.sessionList)
     }
 }
 
 @Composable
-fun RecordCard(record: ChargeRecord, modifier: Modifier = Modifier) {
+fun BatteryChargingSessionList(
+    sessionList: List<BatteryChargingSession>,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(items = sessionList, key = { it.id }) { record ->
+            RecordCard(record)
+        }
+    }
+
+}
+
+@Composable
+fun RecordCard(record: BatteryChargingSession, modifier: Modifier = Modifier) {
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-    val timeCharging = Duration.between(record.start, record.end)
 
     Card(
         modifier = modifier.fillMaxWidth()
@@ -59,13 +78,20 @@ fun RecordCard(record: ChargeRecord, modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 FromToText(
-                    from = stringResource(R.string.percentage, record.from),
-                    to = stringResource(R.string.percentage, record.to),
+                    from = stringResource(
+                        R.string.percentage,
+                        record.initialChargePercentage?.toString() ?: "?"
+                    ),
+                    to = stringResource(
+                        R.string.percentage,
+                        record.finalChargePercentage?.toString() ?: "?"
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
-                    text = record.start.format(formatter),
+                    text = record.startTime?.format(formatter) ?: (record.endTime?.format(formatter)
+                        ?: "?"),
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -73,15 +99,20 @@ fun RecordCard(record: ChargeRecord, modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                PercentageDifferenceText(
-                    value = record.to - record.from,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = stringResource(R.string.duration, formatTime(timeCharging.seconds)),
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                if (record.initialChargePercentage != null && record.finalChargePercentage != null) {
+                    PercentageDifferenceText(
+                        value = record.finalChargePercentage - record.initialChargePercentage,
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+                if (record.startTime != null && record.endTime != null) {
+                    val timeCharging = Duration.between(record.startTime, record.endTime)
+                    Text(
+                        text = stringResource(R.string.duration, formatTime(timeCharging.seconds)),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
             }
         }
     }
@@ -115,7 +146,7 @@ fun FromToText(from: String, to: String, style: TextStyle, modifier: Modifier = 
 }
 
 @Composable
-fun PercentageDifferenceText(value: Int, style: TextStyle, modifier: Modifier = Modifier) {
+fun PercentageDifferenceText(value: Float, style: TextStyle, modifier: Modifier = Modifier) {
     Text(
         text = stringResource(R.string.percentage_difference, value),
         style = style,
@@ -131,17 +162,21 @@ fun PercentageDifferenceText(value: Int, style: TextStyle, modifier: Modifier = 
 @Preview(showBackground = true)
 @Composable
 fun HistoryPreview() {
-    val now = LocalDateTime.now()
-    History(records = listOf(
-        ChargeRecord(now.minusSeconds(1), now, 90, 90),
-        ChargeRecord(now.minusMinutes(195), now.minusMinutes(1), 25, 100),
-        ChargeRecord(now.minusMinutes(1483), now.minusMinutes(1440).plusHours(2), 20, 80),
-        ChargeRecord(now.minusMinutes(2800), now.minusMinutes(2791), 20, 30),
-        ChargeRecord(now.minusMinutes(5500), now.minusMinutes(5000), 75, 73),
-        ChargeRecord(now.minusMinutes(6000), now.minusMinutes(5998), 75, 76),
-        ChargeRecord(now.minusMinutes(12_000), now.minusMinutes(10_000), 0, 100),
-        ChargeRecord(now.minusMinutes(15_000), now.minusMinutes(14_939), 50, 60)
-    ))
+    val now = OffsetDateTime.now()
+    BatteryChargingSessionList(
+        sessionList = listOf(
+            BatteryChargingSession(0, now.minusSeconds(1), now, 90F, 90F),
+            BatteryChargingSession(1, now.minusMinutes(195), now.minusMinutes(1), 25.6F, 100F),
+            BatteryChargingSession(2, now.minusMinutes(1483), now.minusMinutes(1440).plusHours(2), 20F, 80F),
+            BatteryChargingSession(3, now.minusMinutes(2800), now.minusMinutes(2791), 20F, 30F),
+            BatteryChargingSession(4, now.minusMinutes(5500), now.minusMinutes(5000), 75F, 73F),
+            BatteryChargingSession(5, now.minusMinutes(6000), now.minusMinutes(5998), 75F, 76F),
+            BatteryChargingSession(6, now.minusMinutes(12_000), now.minusMinutes(10_000), 0F, 100F),
+            BatteryChargingSession(7, now.minusMinutes(15_000), now.minusMinutes(14_939), 50F, 60F),
+            BatteryChargingSession(8, null, now, null, 60F),
+            BatteryChargingSession(9, now, null, 50F, null)
+        )
+    )
 }
 
 /**

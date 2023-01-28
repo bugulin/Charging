@@ -7,7 +7,7 @@
 
     <string name="duration">in %s</string>
     <string name="percentage">%s\u200a%%</string>
-    <string name="percentage_difference">%+d\u200a%%</string>
+    <string name="percentage_difference">%+.0f\u200a%%</string>
     <string name="timeHoursMinutes">%d\u2009h %d\u2009m</string>
     <string name="timeMinutes">%d\u2009m</string>
     <string name="timeSeconds">%d\u2009s</string>

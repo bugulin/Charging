@@ -21,11 +21,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import cz.bornasp.charging.R
-import cz.bornasp.charging.model.ChargeRecord
 import cz.bornasp.charging.model.ChargingViewModel
 import cz.bornasp.charging.ui.components.SystemBroadcastReceiver
+import cz.bornasp.charging.ui.history.HistoryScreen
 import cz.bornasp.charging.ui.theme.AppIcons
-import java.time.LocalDateTime
 
 /**
  * Enumeration values that represent the screens in the application.
@@ -123,19 +122,7 @@ fun ChargingApp(
                     )
                 }
                 composable(route = ChargingAppScreen.History.name) {
-                    val now = LocalDateTime.now()
-                    History(
-                        records = listOf(
-                            ChargeRecord(now.minusSeconds(1), now, 99, 100),
-                            ChargeRecord(now.minusMinutes(195), now.minusMinutes(1), 25, 100),
-                            ChargeRecord(now.minusMinutes(1483), now.minusMinutes(1440).plusHours(2), 20, 80),
-                            ChargeRecord(now.minusMinutes(2800), now.minusMinutes(2791), 20, 30),
-                            ChargeRecord(now.minusMinutes(5500), now.minusMinutes(5000), 75, 73),
-                            ChargeRecord(now.minusMinutes(6000), now.minusMinutes(5999), 75, 75),
-                            ChargeRecord(now.minusMinutes(12_000), now.minusMinutes(10_000), 0, 100),
-                            ChargeRecord(now.minusMinutes(15_000), now.minusMinutes(14_939), 50, 60)
-                        )
-                    )
+                    HistoryScreen()
                 }
                 composable(route = ChargingAppScreen.Settings.name) {
 
