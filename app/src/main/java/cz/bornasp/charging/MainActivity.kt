@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import cz.bornasp.charging.service.ChargeMonitor
 import cz.bornasp.charging.ui.ChargingApp
 import cz.bornasp.charging.ui.theme.ChargingTheme
 

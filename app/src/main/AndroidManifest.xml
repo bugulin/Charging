@@ -30,7 +30,7 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <service android:name=".ChargeMonitor" />
+        <service android:name=".service.ChargeMonitor" />
     </application>
 
 </manifest>
