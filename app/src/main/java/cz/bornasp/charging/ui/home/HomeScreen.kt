@@ -1,5 +1,6 @@
-package cz.bornasp.charging.ui.history
+package cz.bornasp.charging.ui.home
 
+import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
@@ -26,6 +28,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.bornasp.charging.R
 import cz.bornasp.charging.data.BatteryChargingSession
 import cz.bornasp.charging.ui.AppViewModelProvider
+import cz.bornasp.charging.ui.BatteryStatus
+import cz.bornasp.charging.ui.components.SystemBroadcastReceiver
 import cz.bornasp.charging.ui.theme.AppIcons
 import cz.bornasp.charging.ui.theme.Green
 import cz.bornasp.charging.ui.theme.dark_Green
@@ -35,34 +39,42 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun HistoryScreen(
+fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HistoryViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val historyUiState by viewModel.historyUiState.collectAsState()
-    Column(modifier = modifier.padding(8.dp)) {
-        BatteryChargingSessionList(sessionList = historyUiState.sessionList)
-    }
-}
+    val historyState by viewModel.historyUiState.collectAsState()
+    val listState by viewModel.listState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
-@Composable
-fun BatteryChargingSessionList(
-    sessionList: List<BatteryChargingSession>,
-    modifier: Modifier = Modifier
-) {
     LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        contentPadding = PaddingValues(
+            start = 8.dp,
+            top = 0.dp,
+            end = 8.dp,
+            bottom = 24.dp
+        ),
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
     ) {
-        items(items = sessionList, key = { it.id }) { record ->
-            RecordCard(record)
+        item(key = -1) {
+            SystemBroadcastReceiver(Intent.ACTION_BATTERY_CHANGED, viewModel::update)
+            BatteryStatus(
+                percentage = uiState.batteryPercentage,
+                isPluggedIn = uiState.isPluggedIn,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+        items(items = historyState.sessionList, key = { it.id }) { session ->
+            SessionCard(session)
         }
     }
-
 }
 
 @Composable
-fun RecordCard(record: BatteryChargingSession, modifier: Modifier = Modifier) {
+fun SessionCard(record: BatteryChargingSession, modifier: Modifier = Modifier) {
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
 
     Card(
@@ -116,6 +128,34 @@ fun RecordCard(record: BatteryChargingSession, modifier: Modifier = Modifier) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun SessionCardPreview() {
+    val now = OffsetDateTime.now()
+    val sessionList = listOf(
+        BatteryChargingSession(0, now.minusSeconds(1), now, 90F, 90F),
+        BatteryChargingSession(1, now.minusMinutes(195), now.minusMinutes(1), 25.6F, 100F),
+        BatteryChargingSession(2, now.minusMinutes(1483), now.minusMinutes(1440).plusHours(2), 20F, 80F),
+        BatteryChargingSession(3, now.minusMinutes(2800), now.minusMinutes(2791), 20F, 30F),
+        BatteryChargingSession(4, now.minusMinutes(5500), now.minusMinutes(5000), 75F, 73F),
+        BatteryChargingSession(5, now.minusMinutes(6000), now.minusMinutes(5998), 75F, 76F),
+        BatteryChargingSession(6, now.minusMinutes(12_000), now.minusMinutes(10_000), 0F, 100F),
+        BatteryChargingSession(7, now.minusMinutes(15_000), now.minusMinutes(14_939), 50F, 60F),
+        BatteryChargingSession(8, null, now, null, 60F),
+        BatteryChargingSession(9, now, null, 50F, null)
+    )
+    
+    LazyColumn(
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        items(items = sessionList, key = { it.id }) { session ->
+            SessionCard(session)
+        }
+    }
+}
+
+
 @Composable
 fun FromToText(from: String, to: String, style: TextStyle, modifier: Modifier = Modifier) {
     val arrowId = "arrow"
@@ -154,26 +194,6 @@ fun PercentageDifferenceText(value: Float, style: TextStyle, modifier: Modifier 
             else -> MaterialTheme.colorScheme.onSurface
         },
         modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HistoryPreview() {
-    val now = OffsetDateTime.now()
-    BatteryChargingSessionList(
-        sessionList = listOf(
-            BatteryChargingSession(0, now.minusSeconds(1), now, 90F, 90F),
-            BatteryChargingSession(1, now.minusMinutes(195), now.minusMinutes(1), 25.6F, 100F),
-            BatteryChargingSession(2, now.minusMinutes(1483), now.minusMinutes(1440).plusHours(2), 20F, 80F),
-            BatteryChargingSession(3, now.minusMinutes(2800), now.minusMinutes(2791), 20F, 30F),
-            BatteryChargingSession(4, now.minusMinutes(5500), now.minusMinutes(5000), 75F, 73F),
-            BatteryChargingSession(5, now.minusMinutes(6000), now.minusMinutes(5998), 75F, 76F),
-            BatteryChargingSession(6, now.minusMinutes(12_000), now.minusMinutes(10_000), 0F, 100F),
-            BatteryChargingSession(7, now.minusMinutes(15_000), now.minusMinutes(14_939), 50F, 60F),
-            BatteryChargingSession(8, null, now, null, 60F),
-            BatteryChargingSession(9, now, null, 50F, null)
-        )
     )
 }
 

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import cz.bornasp.charging.ChargingApplication
 import cz.bornasp.charging.ui.AppViewModelProvider.Factory
-import cz.bornasp.charging.ui.history.HistoryViewModel
+import cz.bornasp.charging.ui.home.HomeViewModel
 
 /**
  * Provide [Factory] to create instance of [ViewModel] for the entire application.
@@ -15,7 +15,7 @@ import cz.bornasp.charging.ui.history.HistoryViewModel
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            HistoryViewModel(chargingApplication().container.batteryChargingSessionRepository)
+            HomeViewModel(chargingApplication().container.batteryChargingSessionRepository)
         }
     }
 }

@@ -25,8 +25,6 @@ fun BatteryStatus(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
     ) {
         Text(
             text = stringResource(R.string.percentage, percentage),
