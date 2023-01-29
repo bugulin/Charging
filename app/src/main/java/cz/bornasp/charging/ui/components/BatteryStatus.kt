@@ -1,4 +1,4 @@
-package cz.bornasp.charging.ui
+package cz.bornasp.charging.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.Bolt
@@ -17,16 +17,14 @@ import cz.bornasp.charging.ui.theme.ChargingTheme
 
 @Composable
 fun BatteryStatus(
-    percentage: Int,
-    isPluggedIn: Boolean,
+    percentage: Float,
+    power: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
     ) {
         Text(
             text = stringResource(R.string.percentage, percentage),
@@ -37,7 +35,7 @@ fun BatteryStatus(
                 .height(64.dp)
                 .padding(16.dp)
         ) {
-            if (isPluggedIn) {
+            if (power) {
                 Icon(
                     imageVector = AppIcons.Bolt,
                     contentDescription = stringResource(R.string.charging),
@@ -53,6 +51,6 @@ fun BatteryStatus(
 @Composable
 fun BatteryStatusPreview() {
     ChargingTheme {
-        BatteryStatus(percentage = 20, isPluggedIn = true)
+        BatteryStatus(percentage = 20F, power = true)
     }
 }

@@ -1,4 +1,4 @@
-package cz.bornasp.charging
+package cz.bornasp.charging.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,6 +11,7 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.os.IBinder
 import android.util.Log
+import cz.bornasp.charging.R
 import cz.bornasp.charging.data.AppDataContainer
 import cz.bornasp.charging.data.BatteryChargingSession
 import kotlinx.coroutines.Dispatchers
