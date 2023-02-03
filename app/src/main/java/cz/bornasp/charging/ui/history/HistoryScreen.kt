@@ -19,10 +19,16 @@ import cz.bornasp.charging.R
 import cz.bornasp.charging.data.BatteryChargingSession
 import cz.bornasp.charging.ui.AppViewModelProvider
 import cz.bornasp.charging.ui.components.BatteryChargingSessionCard
+import cz.bornasp.charging.ui.navigation.NavigationDestination
 import cz.bornasp.charging.ui.theme.AppIcons
 import java.time.OffsetDateTime
 
-@ExperimentalMaterial3Api
+object HistoryDestination : NavigationDestination {
+    override val route = "history"
+    override val titleRes = R.string.history
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     navigateUp: () -> Unit,
@@ -38,7 +44,7 @@ fun HistoryScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.history),
+                        text = stringResource(HistoryDestination.titleRes),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

@@ -26,9 +26,15 @@ import cz.bornasp.charging.ui.AppViewModelProvider
 import cz.bornasp.charging.ui.components.BatteryStatus
 import cz.bornasp.charging.ui.components.SystemBroadcastReceiver
 import cz.bornasp.charging.ui.components.formatDuration
+import cz.bornasp.charging.ui.navigation.NavigationDestination
 import cz.bornasp.charging.ui.theme.AppIcons
 import cz.bornasp.charging.ui.theme.ChargingTheme
 import java.time.OffsetDateTime
+
+object HomeDestination : NavigationDestination {
+    override val route = "home"
+    override val titleRes = R.string.app_name
+}
 
 @Composable
 fun HomeScreen(
@@ -45,7 +51,7 @@ fun HomeScreen(
         BatteryManager.BATTERY_STATUS_DISCHARGING -> R.string.discharging
         BatteryManager.BATTERY_STATUS_FULL -> R.string.fully_charged
         BatteryManager.BATTERY_STATUS_NOT_CHARGING -> R.string.not_charging
-        else -> R.string.app_name
+        else -> HomeDestination.titleRes
     }
 
     SystemBroadcastReceiver(Intent.ACTION_BATTERY_CHANGED, viewModel::update)
