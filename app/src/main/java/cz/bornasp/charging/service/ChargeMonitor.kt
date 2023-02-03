@@ -89,9 +89,9 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
         val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
             context.registerReceiver(null, ifilter)
         }
-        val batteryPercentage: Float? = batteryStatus?.let { intent ->
-            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        val batteryPercentage: Float? = batteryStatus?.let {
+            val level: Int = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val scale: Int = it.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
             level * 100 / scale.toFloat()
         }
 
