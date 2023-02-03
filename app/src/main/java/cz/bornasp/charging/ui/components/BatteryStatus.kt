@@ -39,7 +39,7 @@ fun BatteryStatus(
                 Icon(
                     imageVector = AppIcons.Bolt,
                     contentDescription = stringResource(R.string.charging),
-                    tint = MaterialTheme.colorScheme.secondary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.fillMaxSize()
                 )
             }

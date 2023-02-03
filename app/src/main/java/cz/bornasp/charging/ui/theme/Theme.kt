@@ -61,9 +61,9 @@ fun ChargingTheme(
             val window = (view.context as Activity).window
             val insets = WindowCompat.getInsetsController(window, view)
             window.statusBarColor = colorScheme.primary.toArgb()
-            window.navigationBarColor = colorScheme.primary.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
             insets.isAppearanceLightStatusBars = darkTheme
-            insets.isAppearanceLightNavigationBars = darkTheme
+            insets.isAppearanceLightNavigationBars = !darkTheme
         }
     }
 

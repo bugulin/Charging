@@ -2,7 +2,6 @@ package cz.bornasp.charging.ui.home
 
 import android.content.Intent
 import android.os.BatteryManager
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.bornasp.charging.data.BatteryChargingSession
@@ -13,18 +12,17 @@ import kotlinx.coroutines.flow.*
  * View model with current battery status and all battery charging sessions in the database.
  */
 class HomeViewModel(sessionRepository: BatteryChargingSessionRepository) : ViewModel() {
-    private val _uiState = MutableStateFlow(HomeUiState(-1F, false))
+    private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    val listState = MutableStateFlow(LazyListState())
-
-    val historyUiState: StateFlow<HistoryUiState> = sessionRepository.getAllRecordsStream()
-        .map { HistoryUiState(it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = HistoryUiState()
-        )
+    val lastChargingSession: StateFlow<BatteryChargingSession?> =
+        sessionRepository.getLastRecordStream()
+            .filterNotNull()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = null
+            )
 
     /**
      * Update displayed information about battery status.
@@ -32,15 +30,21 @@ class HomeViewModel(sessionRepository: BatteryChargingSessionRepository) : ViewM
      */
     fun update(batteryStatus: Intent?) {
         val chargePlug: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
-        val batteryPercentage: Float? = batteryStatus?.let { intent ->
+        val percentage: Float? = batteryStatus?.let { intent ->
             val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
             val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
             level * 100 / scale.toFloat()
         }
-        _uiState.value = HomeUiState(
-            batteryPercentage = batteryPercentage ?: -1F,
-            isPluggedIn = chargePlug != 0
-        )
+        val status = batteryStatus?.getIntExtra(
+            BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN
+        ) ?: BatteryManager.BATTERY_STATUS_UNKNOWN
+        _uiState.update { currentState ->
+            currentState.copy(
+                batteryPercentage = percentage ?: -1F,
+                batteryStatus = status,
+                isPluggedIn = chargePlug != 0
+            )
+        }
     }
 
     companion object {
@@ -49,16 +53,10 @@ class HomeViewModel(sessionRepository: BatteryChargingSessionRepository) : ViewM
 }
 
 /**
- * UI state for history of battery charging.
- */
-data class HistoryUiState(
-    val sessionList: List<BatteryChargingSession> = listOf()
-)
-
-/**
  * UI state for home screen.
  */
 data class HomeUiState(
-    val batteryPercentage: Float,
-    val isPluggedIn: Boolean
+    val batteryPercentage: Float = -1F,
+    val batteryStatus: Int = BatteryManager.BATTERY_STATUS_UNKNOWN,
+    val isPluggedIn: Boolean = false,
 )

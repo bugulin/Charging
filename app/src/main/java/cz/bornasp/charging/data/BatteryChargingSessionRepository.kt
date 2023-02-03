@@ -10,7 +10,12 @@ class BatteryChargingSessionRepository(private val sessionDao: BatteryChargingSe
     /**
      * Retrieve most recent session from the data source.
      */
-    fun getLastRecordStream(): BatteryChargingSession? = sessionDao.getLastSession()
+    fun getLastRecord(): BatteryChargingSession? = sessionDao.getLastSession()
+
+    /**
+     * Retrieve most recent session from the data source as a data stream.
+     */
+    fun getLastRecordStream(): Flow<BatteryChargingSession?> = sessionDao.getLastSessionStream()
 
     /**
      * Retrieve all the recorded sessions from the data source.

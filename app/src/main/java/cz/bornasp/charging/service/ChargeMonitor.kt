@@ -121,7 +121,7 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
     private suspend fun endSession(context: Context, batteryPercentage: Float?) {
         val repository = AppDataContainer(context).batteryChargingSessionRepository
         withContext(Dispatchers.IO) {
-            val session = repository.getLastRecordStream()
+            val session = repository.getLastRecord()
             if (session == null || session.endTime != null) {
                 // We missed current session's start
                 repository.insertRecord(
