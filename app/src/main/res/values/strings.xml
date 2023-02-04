@@ -1,25 +1,27 @@
 <resources>
     <string name="app_name">Charging</string>
+    <string name="back">Go back</string>
     <string name="charge_alarm">Battery charge alarm</string>
     <string name="history">Charging history</string>
     <string name="settings">Settings</string>
 
+    <string name="charging_time">Charging %s</string>
     <string name="duration">in %s</string>
     <string name="percentage">%.0f\u200a%%</string>
     <string name="percentage_difference">%+.0f\u200a%%</string>
+    <string name="time_from_last_charging">%s from last charging</string>
     <string name="timeHoursMinutes">%1$d\u2009h %2$d\u2009m</string>
     <string name="timeMinutes">%d\u2009m</string>
     <string name="timeSeconds">%d\u2009s</string>
     <string name="to">to</string>
-    <string name="back">Go back</string>
-
-    <string name="service_channel_name">Foreground service</string>
-    <string name="service_channel_description">Show notification that the foreground service is running.</string>
-    <string name="time_from_last_charging">%s from last charging</string>
-    <string name="charging_time">Charging %s</string>
 
     <string name="charging">Charging</string>
     <string name="discharging">Discharging</string>
     <string name="fully_charged">Fully charged</string>
     <string name="not_charging">Not charging</string>
+
+    <string name="no_history">Once you start charging your device,\na new record will appear here.</string>
+
+    <string name="service_channel_name">Foreground service</string>
+    <string name="service_channel_description">Show notification that the foreground service is running.</string>
 </resources>

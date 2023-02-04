@@ -109,13 +109,11 @@ fun HomeScreenContent(
             modifier = Modifier
                 .padding(16.dp, 8.dp, 16.dp, 64.dp)
         )
-        if (message != null) {
-            Text(
-                text = message,
-                modifier = Modifier.padding(8.dp),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+        Text(
+            text = message ?: "",
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
