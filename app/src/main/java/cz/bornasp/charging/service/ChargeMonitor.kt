@@ -3,13 +3,16 @@ package cz.bornasp.charging.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.BatteryManager
 import android.os.IBinder
+import android.provider.Settings
 import android.util.Log
 import cz.bornasp.charging.R
 import cz.bornasp.charging.data.AppDataContainer
@@ -33,7 +36,19 @@ class ChargeMonitor : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Promote service to the foreground
+        val pendingIntent: PendingIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            .apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                setDataAndNormalize(Uri.parse("package:$packageName"))
+            }
+            .let { notificationIntent ->
+                PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+            }
         val notification: Notification = Notification.Builder(this, SERVICE_NOTIFICATION_CHANNEL)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(getString(R.string.charge_monitor_notification_title))
+            .setContentText(getString(R.string.charge_monitor_notification_text))
+            .setContentIntent(pendingIntent)
             .build()
         startForeground(startId, notification)
 
@@ -64,6 +79,7 @@ class ChargeMonitor : Service() {
             NotificationManager.IMPORTANCE_LOW
         ).apply {
             description = getString(R.string.service_channel_description)
+            setShowBadge(false)
         }
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(serviceChannel)

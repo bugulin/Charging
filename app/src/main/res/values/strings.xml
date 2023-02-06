@@ -23,7 +23,9 @@
     <string name="no_history">Once you start charging your device,\na new record will appear here.</string>
 
     <string name="service_channel_name">Foreground service</string>
-    <string name="service_channel_description">Show notification that the foreground service is running.</string>
+    <string name="service_channel_description">Mandatory notification that the foreground service is running.</string>
+    <string name="charge_monitor_notification_title">Charge monitor is running</string>
+    <string name="charge_monitor_notification_text">This service watches battery status.</string>
 
     <string name="statistics">Statistics</string>
     <string name="refresh">Refresh</string>
