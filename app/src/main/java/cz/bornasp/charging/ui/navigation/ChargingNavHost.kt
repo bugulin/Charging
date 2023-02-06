@@ -9,6 +9,8 @@ import cz.bornasp.charging.ui.history.HistoryDestination
 import cz.bornasp.charging.ui.history.HistoryScreen
 import cz.bornasp.charging.ui.home.HomeDestination
 import cz.bornasp.charging.ui.home.HomeScreen
+import cz.bornasp.charging.ui.statistics.StatisticsDestination
+import cz.bornasp.charging.ui.statistics.StatisticsScreen
 
 @Composable
 fun ChargingNavHost(
@@ -23,11 +25,15 @@ fun ChargingNavHost(
         composable(route = HomeDestination.route) {
             HomeScreen(
                 navigateToChargeAlarm = { },
-                navigateToHistory = { navController.navigate(HistoryDestination.route) }
+                navigateToHistory = { navController.navigate(HistoryDestination.route) },
+                navigateToStatistics = { navController.navigate(StatisticsDestination.route) }
             )
         }
         composable(route = HistoryDestination.route) {
             HistoryScreen(navigateUp = { navController.navigateUp() })
+        }
+        composable(route = StatisticsDestination.route) {
+            StatisticsScreen(navigateUp = { navController.navigateUp() })
         }
     }
 }

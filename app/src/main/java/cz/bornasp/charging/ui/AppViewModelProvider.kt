@@ -9,6 +9,7 @@ import cz.bornasp.charging.ChargingApplication
 import cz.bornasp.charging.ui.AppViewModelProvider.Factory
 import cz.bornasp.charging.ui.history.HistoryViewModel
 import cz.bornasp.charging.ui.home.HomeViewModel
+import cz.bornasp.charging.ui.statistics.StatisticsViewModel
 
 /**
  * Provide [Factory] to create instance of [ViewModel] for the entire application.
@@ -20,6 +21,9 @@ object AppViewModelProvider {
         }
         initializer {
             HistoryViewModel(chargingApplication().container.batteryChargingSessionRepository)
+        }
+        initializer {
+            StatisticsViewModel(chargingApplication().container.batteryChargingSessionRepository)
         }
     }
 }

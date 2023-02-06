@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.filled.AlarmAdd
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ object HomeDestination : NavigationDestination {
 fun HomeScreen(
     navigateToChargeAlarm: () -> Unit,
     navigateToHistory: () -> Unit,
+    navigateToStatistics: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -61,7 +63,8 @@ fun HomeScreen(
         modifier = modifier,
         uiState = uiState,
         navigateToChargeAlarm = navigateToChargeAlarm,
-        navigateToHistory = navigateToHistory
+        navigateToHistory = navigateToHistory,
+        navigateToStatistics = navigateToStatistics
     )
 }
 
@@ -73,7 +76,8 @@ fun HomeScreenContent(
     modifier: Modifier,
     uiState: HomeUiState,
     navigateToChargeAlarm: () -> Unit,
-    navigateToHistory: () -> Unit
+    navigateToHistory: () -> Unit,
+    navigateToStatistics: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -93,6 +97,12 @@ fun HomeScreenContent(
                     Icon(
                         imageVector = AppIcons.AlarmAdd,
                         contentDescription = stringResource(R.string.charge_alarm)
+                    )
+                }
+                IconButton(onClick = navigateToStatistics) {
+                    Icon(
+                        imageVector = AppIcons.Analytics,
+                        contentDescription = stringResource(R.string.statistics)
                     )
                 }
                 IconButton(onClick = navigateToHistory) {
@@ -124,6 +134,7 @@ fun HomeScreenPreview() {
         HomeScreenContent(
             navigateToChargeAlarm = { },
             navigateToHistory = { },
+            navigateToStatistics = { },
             title = R.string.app_name,
             message = stringResource(R.string.time_from_last_charging, "30 minutes"),
             uiState = HomeUiState(80F, BatteryManager.BATTERY_STATUS_CHARGING, true),
@@ -144,7 +155,7 @@ private fun getLastEventMessage(lastCharging: BatteryChargingSession?): String? 
             )
         } else if (lastCharging.startTime != null) {
             message = stringResource(
-                R.string.charging_time,
+                R.string.current_charging_time,
                 formatDuration(now.toEpochSecond() - lastCharging.startTime.toEpochSecond())
             )
         }
