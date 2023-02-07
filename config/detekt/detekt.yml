@@ -1,0 +1,22 @@
+output-reports:
+  active: true
+  exclude:
+    - 'TxtOutputReport'
+    - 'XmlOutputReport'
+    - 'SarifOutputReport'
+    - 'MdOutputReport'
+
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 80
+  TooManyFunctions:
+    active: false
+
+naming:
+  active: true
+  FunctionNaming:
+    active: false
+  MatchingDeclarationName:
+    active: false
