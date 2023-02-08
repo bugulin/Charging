@@ -3,12 +3,21 @@
 package cz.bornasp.charging.ui.statistics
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -89,24 +98,23 @@ fun Statistics(
     statistics: ChargingStatistics,
     modifier: Modifier = Modifier
 ) {
+    val chargingTime = statistics.totalChargingTimeInSeconds / statistics.completeSessionCount
     val totalItems = listOf(
         Pair(
             R.string.charging_sessions,
-            if (statistics.sessionCount == statistics.completeSessionCount)
+            if (statistics.sessionCount == statistics.completeSessionCount) {
                 statistics.sessionCount.toString()
-            else
+            } else {
                 stringResource(
                     R.string.complete_incomplete_session_count,
                     statistics.completeSessionCount,
                     statistics.sessionCount
                 )
+            }
         ),
         Pair(
             R.string.total_charge_percentage,
-            stringResource(
-                R.string.percentage,
-                statistics.totalChargePercentage
-            )
+            stringResource(R.string.percentage, statistics.totalChargePercentage)
         ),
         Pair(
             R.string.total_charging_time,
@@ -116,31 +124,31 @@ fun Statistics(
     val averageItems = listOf(
         Pair(
             R.string.initial_charge,
-            if (statistics.averageInitialChargePercentage != null)
-                stringResource(
-                    R.string.percentage,
-                    statistics.averageInitialChargePercentage
-                )
-            else null
+            if (statistics.averageInitialChargePercentage != null) {
+                stringResource(R.string.percentage, statistics.averageInitialChargePercentage)
+            } else {
+                null
+            }
         ),
         Pair(
             R.string.final_charge,
-            if (statistics.averageFinalChargePercentage != null)
-                stringResource(
-                    R.string.percentage,
-                    statistics.averageFinalChargePercentage
-                )
-            else null
+            if (statistics.averageFinalChargePercentage != null) {
+                stringResource(R.string.percentage, statistics.averageFinalChargePercentage)
+            } else {
+                null
+            }
         ),
         Pair(
             R.string.charging_time,
-            formatDuration(seconds = (statistics.totalChargingTimeInSeconds / statistics.completeSessionCount).toLong())
+            formatDuration(seconds = chargingTime.toLong())
         ),
         Pair(
             R.string.battery_time,
-            if (statistics.averageBatteryTimeInSeconds != null)
+            if (statistics.averageBatteryTimeInSeconds != null) {
                 formatDuration(seconds = statistics.averageBatteryTimeInSeconds.toLong())
-            else null
+            } else {
+                null
+            }
         )
     )
 

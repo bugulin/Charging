@@ -36,9 +36,9 @@ class BatteryChargingSessionRepository(private val sessionDao: BatteryChargingSe
             averageInitialChargePercentage = sessionDao.getAverageInitialCharge(),
             averageFinalChargePercentage = sessionDao.getAverageFinalCharge(),
             totalChargingTimeInSeconds =
-                (sessionDao.getTotalChargingTimeInDays() ?: 0f) * SECONDS_IN_DAY,
+            (sessionDao.getTotalChargingTimeInDays() ?: 0f) * SECONDS_IN_DAY,
             averageBatteryTimeInSeconds =
-                if (avgBatteryTime != null) avgBatteryTime * SECONDS_IN_DAY else null
+            if (avgBatteryTime != null) avgBatteryTime * SECONDS_IN_DAY else null
         )
     }
 

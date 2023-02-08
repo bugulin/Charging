@@ -23,6 +23,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.time.OffsetDateTime
 
+const val TO_PERCENTAGE = 100
 private const val TAG = "ChargeMonitor"
 private const val SERVICE_NOTIFICATION_CHANNEL = "charge-monitor"
 
@@ -108,7 +109,7 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
         val batteryPercentage: Float? = batteryStatus?.let {
             val level: Int = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
             val scale: Int = it.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            level * 100 / scale.toFloat()
+            level * TO_PERCENTAGE / scale.toFloat()
         }
 
         runBlocking {

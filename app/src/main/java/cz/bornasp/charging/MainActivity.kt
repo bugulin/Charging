@@ -49,5 +49,5 @@ fun DefaultPreview() {
 
 @Composable
 fun ChargingApp(navController: NavHostController = rememberNavController()) {
-   ChargingNavHost(navController = navController)
+    ChargingNavHost(navController = navController)
 }

@@ -10,7 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.filled.AlarmAdd
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -121,7 +126,7 @@ fun HomeScreenContent(
         )
         Text(
             text = message ?: "",
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -137,7 +142,7 @@ fun HomeScreenPreview() {
             navigateToStatistics = { },
             title = R.string.app_name,
             message = stringResource(R.string.time_from_last_charging, "30 minutes"),
-            uiState = HomeUiState(80F, BatteryManager.BATTERY_STATUS_CHARGING, true),
+            uiState = HomeUiState(80f, BatteryManager.BATTERY_STATUS_CHARGING, true),
             modifier = Modifier
         )
     }
