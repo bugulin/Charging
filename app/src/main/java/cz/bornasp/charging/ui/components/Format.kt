@@ -1,6 +1,5 @@
 package cz.bornasp.charging.ui.components
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.filled.ArrowForward
@@ -16,8 +15,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import cz.bornasp.charging.R
 import cz.bornasp.charging.ui.theme.AppIcons
-import cz.bornasp.charging.ui.theme.Green
-import cz.bornasp.charging.ui.theme.dark_Green
 
 private const val MINUTES_IN_HOUR = 60
 private const val SECONDS_IN_MINUTE = 60
@@ -65,9 +62,9 @@ fun PercentageDifferenceText(value: Float, style: TextStyle, modifier: Modifier 
         text = stringResource(R.string.percentage_difference, value),
         modifier = modifier,
         color = when {
-            value > 0 -> if (isSystemInDarkTheme()) dark_Green else Green
+            value > 0 -> MaterialTheme.colorScheme.primary
             value < 0 -> MaterialTheme.colorScheme.error
-            else -> MaterialTheme.colorScheme.onSurface
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
         },
         style = style
     )

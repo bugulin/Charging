@@ -26,7 +26,8 @@ fun BatteryChargingSessionCard(record: BatteryChargingSession, modifier: Modifie
         ?: (record.endTime?.format(formatter) ?: stringResource(R.string.unknown_value))
 
     Card(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         Column(
             modifier = Modifier

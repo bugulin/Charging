@@ -126,7 +126,7 @@ fun HomeScreenContent(
         )
         Text(
             text = message ?: "",
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodyMedium
         )
     }

@@ -3,7 +3,6 @@
     <string name="back">Go back</string>
     <string name="charge_alarm">Battery charge alarm</string>
     <string name="history">Charging history</string>
-    <string name="settings">Settings</string>
 
     <string name="current_charging_time">Charging %s</string>
     <string name="duration">in %s</string>

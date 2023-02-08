@@ -4,8 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -46,8 +43,6 @@ object HistoryDestination : NavigationDestination {
     override val route = "history"
     override val titleRes = R.string.history
 }
-
-private const val LARGE_TOP_APP_BAR_HEIGHT = 152
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,44 +95,37 @@ fun BatteryChargingSessionList(
     sessionList: List<BatteryChargingSession>,
     modifier: Modifier = Modifier
 ) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-
-    LazyColumn(
-        modifier = modifier,
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        userScrollEnabled = sessionList.isNotEmpty()
-    ) {
-        items(items = sessionList, key = { it.id }) { record ->
-            BatteryChargingSessionCard(record)
+    if (sessionList.isEmpty()) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = AppIcons.BatteryChargingFull,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(64.dp),
+                tint = MaterialTheme.colorScheme.secondary
+            )
+            Text(
+                text = stringResource(R.string.no_history),
+                modifier = Modifier
+                    .padding(bottom = 64.dp),
+                fontStyle = FontStyle.Italic,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
-        if (sessionList.isEmpty()) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(screenHeight - LARGE_TOP_APP_BAR_HEIGHT.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = AppIcons.BatteryChargingFull,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(64.dp),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                    Text(
-                        text = stringResource(R.string.no_history),
-                        modifier = Modifier
-                            .padding(bottom = 64.dp),
-                        fontStyle = FontStyle.Italic,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+    } else {
+        LazyColumn(
+            modifier = modifier,
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(items = sessionList, key = { it.id }) { record ->
+                BatteryChargingSessionCard(record)
             }
         }
     }
@@ -176,5 +164,8 @@ fun HistoryPreview() {
 @Preview(showBackground = true)
 @Composable
 fun EmptyHistoryPreview() {
-    BatteryChargingSessionList(sessionList = listOf())
+    BatteryChargingSessionList(
+        sessionList = listOf(),
+        modifier = Modifier.fillMaxSize()
+    )
 }
