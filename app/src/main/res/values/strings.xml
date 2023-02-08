@@ -9,6 +9,7 @@
     <string name="percentage">%.0f\u200a%%</string>
     <string name="percentage_difference">%+.0f\u200a%%</string>
     <string name="time_from_last_charging">%s from last charging</string>
+    <string name="time_days_hours">%1$d\u2009d %2$d\u2009h</string>
     <string name="timeHoursMinutes">%1$d\u2009h %2$d\u2009m</string>
     <string name="timeMinutes">%d\u2009m</string>
     <string name="timeSeconds">%d\u2009s</string>

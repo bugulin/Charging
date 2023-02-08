@@ -16,6 +16,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import cz.bornasp.charging.R
 import cz.bornasp.charging.ui.theme.AppIcons
 
+private const val HOURS_IN_DAY = 24
 private const val MINUTES_IN_HOUR = 60
 private const val SECONDS_IN_MINUTE = 60
 private const val TEXT_ICON_SCALE = 0.9
@@ -78,8 +79,10 @@ fun PercentageDifferenceText(value: Float, style: TextStyle, modifier: Modifier 
 fun formatDuration(seconds: Long): String {
     val minutes = seconds / SECONDS_IN_MINUTE
     val hours = minutes / MINUTES_IN_HOUR
+    val days = hours / HOURS_IN_DAY
 
     return when {
+        days != 0L -> stringResource(R.string.time_days_hours, days, hours % HOURS_IN_DAY)
         hours != 0L -> stringResource(R.string.timeHoursMinutes, hours, minutes % MINUTES_IN_HOUR)
         minutes != 0L -> stringResource(R.string.timeMinutes, minutes)
         else -> stringResource(R.string.timeSeconds, seconds)
