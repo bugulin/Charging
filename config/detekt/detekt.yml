@@ -11,12 +11,34 @@ complexity:
   LongMethod:
     active: true
     threshold: 80
+  LongParameterList:
+    active: true
+    functionThreshold: 16
   TooManyFunctions:
     active: false
 
 naming:
   active: true
+  BooleanPropertyNaming:
+    active: true
   FunctionNaming:
     active: false
   MatchingDeclarationName:
     active: false
+
+style:
+  MagicNumber:
+    active: true
+    excludes:
+      - '**/test/**'
+      - '**/androidTest/**'
+      - '**/commonTest/**'
+      - '**/*.kts'
+      - '**/theme/Color.kt'
+      - '**/ui/**/*Screen.kt'
+  MaxLineLength:
+    active: true
+    maxLineLength: 100
+    excludeCommentStatements: true
+  TrailingWhitespace:
+    active: true

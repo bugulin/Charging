@@ -19,6 +19,10 @@ import cz.bornasp.charging.ui.theme.AppIcons
 import cz.bornasp.charging.ui.theme.Green
 import cz.bornasp.charging.ui.theme.dark_Green
 
+private const val MINUTES_IN_HOUR = 60
+private const val SECONDS_IN_MINUTE = 60
+private const val TEXT_ICON_SCALE = 0.9
+
 /**
  * Display transition as a text with an arrow.
  * @param from Text on the left.
@@ -27,7 +31,7 @@ import cz.bornasp.charging.ui.theme.dark_Green
 @Composable
 fun FromToText(from: String, to: String, style: TextStyle, modifier: Modifier = Modifier) {
     val arrowId = "arrow"
-    val arrowSize = style.fontSize * 0.9
+    val arrowSize = style.fontSize * TEXT_ICON_SCALE
     val text = buildAnnotatedString {
         append(from)
         append(" ")
@@ -56,15 +60,16 @@ fun FromToText(from: String, to: String, style: TextStyle, modifier: Modifier = 
  * @param value Percentage to display.
  */
 @Composable
-fun PercentageDifferenceText(
-    value: Float, style: TextStyle, modifier: Modifier = Modifier
-) {
+fun PercentageDifferenceText(value: Float, style: TextStyle, modifier: Modifier = Modifier) {
     Text(
-        text = stringResource(R.string.percentage_difference, value), style = style, color = when {
+        text = stringResource(R.string.percentage_difference, value),
+        modifier = modifier,
+        color = when {
             value > 0 -> if (isSystemInDarkTheme()) dark_Green else Green
             value < 0 -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurface
-        }, modifier = modifier
+        },
+        style = style
     )
 }
 
@@ -74,11 +79,11 @@ fun PercentageDifferenceText(
  */
 @Composable
 fun formatDuration(seconds: Long): String {
-    val minutes = seconds / 60
-    val hours = minutes / 60
+    val minutes = seconds / SECONDS_IN_MINUTE
+    val hours = minutes / MINUTES_IN_HOUR
 
     return when {
-        hours != 0L -> stringResource(R.string.timeHoursMinutes, hours, minutes % 60)
+        hours != 0L -> stringResource(R.string.timeHoursMinutes, hours, minutes % MINUTES_IN_HOUR)
         minutes != 0L -> stringResource(R.string.timeMinutes, minutes)
         else -> stringResource(R.string.timeSeconds, seconds)
     }

@@ -6,7 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.bornasp.charging.data.BatteryChargingSession
 import cz.bornasp.charging.data.BatteryChargingSessionRepository
-import kotlinx.coroutines.flow.*
+import cz.bornasp.charging.service.TO_PERCENTAGE
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 /**
  * View model with current battery status and all battery charging sessions in the database.
@@ -33,14 +40,15 @@ class HomeViewModel(sessionRepository: BatteryChargingSessionRepository) : ViewM
         val percentage: Float? = batteryStatus?.let { intent ->
             val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
             val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            level * 100 / scale.toFloat()
+            level * TO_PERCENTAGE / scale.toFloat()
         }
         val status = batteryStatus?.getIntExtra(
-            BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN
+            BatteryManager.EXTRA_STATUS,
+            BatteryManager.BATTERY_STATUS_UNKNOWN
         ) ?: BatteryManager.BATTERY_STATUS_UNKNOWN
         _uiState.update { currentState ->
             currentState.copy(
-                batteryPercentage = percentage ?: -1F,
+                batteryPercentage = percentage ?: -1f,
                 batteryStatus = status,
                 isPluggedIn = chargePlug != 0
             )

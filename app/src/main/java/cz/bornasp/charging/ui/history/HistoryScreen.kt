@@ -1,11 +1,25 @@
 package cz.bornasp.charging.ui.history
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BatteryChargingFull
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,8 +78,11 @@ fun HistoryScreen(
                         )
                     }
                 },
-                scrollBehavior = if (historyUiState.sessionList.isEmpty()) null
-                    else scrollBehavior
+                scrollBehavior = if (historyUiState.sessionList.isEmpty()) {
+                    null
+                } else {
+                    scrollBehavior
+                }
             )
         }
     ) { innerPadding ->
@@ -130,20 +147,30 @@ fun BatteryChargingSessionList(
 @Composable
 fun HistoryPreview() {
     val now = OffsetDateTime.now()
-    val sessionList = listOf(
-        BatteryChargingSession(0, now.minusSeconds(1), now, 90F, 90F),
-        BatteryChargingSession(1, now.minusMinutes(195), now.minusMinutes(1), 25.6F, 100F),
-        BatteryChargingSession(2, now.minusMinutes(1483), now.minusMinutes(1440).plusHours(2), 20F, 80F),
-        BatteryChargingSession(3, now.minusMinutes(2800), now.minusMinutes(2791), 20F, 30F),
-        BatteryChargingSession(4, now.minusMinutes(5500), now.minusMinutes(5000), 75F, 73F),
-        BatteryChargingSession(5, now.minusMinutes(6000), now.minusMinutes(5998), 75F, 76F),
-        BatteryChargingSession(6, now.minusMinutes(12_000), now.minusMinutes(10_000), 0F, 100F),
-        BatteryChargingSession(7, now.minusMinutes(15_000), now.minusMinutes(14_939), 50F, 60F),
-        BatteryChargingSession(8, null, now, null, 60F),
-        BatteryChargingSession(9, now, null, 50F, null)
+    val data = listOf(
+        Pair(now.minusSeconds(1) to now, 90f to 90f),
+        Pair(now.minusMinutes(195) to now.minusMinutes(1), 25.6f to 100f),
+        Pair(now.minusMinutes(1483) to now.minusMinutes(1320), 20f to 80f),
+        Pair(now.minusMinutes(2800) to now.minusMinutes(2791), 20f to 30f),
+        Pair(now.minusMinutes(5500) to now.minusMinutes(5000), 75f to 73f),
+        Pair(now.minusMinutes(6000) to now.minusMinutes(5998), 75f to 76f),
+        Pair(now.minusMinutes(12_000) to now.minusMinutes(10_000), 0f to 100f),
+        Pair(now.minusMinutes(15_000) to now.minusMinutes(14_939), 50f to 60f),
+        Pair(null to now, null to 60f),
+        Pair(now to null, 50f to null)
     )
 
-    BatteryChargingSessionList(sessionList)
+    BatteryChargingSessionList(
+        sessionList = data.mapIndexed { index, item ->
+            BatteryChargingSession(
+                id = index,
+                startTime = item.first.first,
+                endTime = item.first.second,
+                initialChargePercentage = item.second.first,
+                finalChargePercentage = item.second.second
+            )
+        }
+    )
 }
 
 @Preview(showBackground = true)

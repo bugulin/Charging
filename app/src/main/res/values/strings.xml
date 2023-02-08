@@ -39,4 +39,5 @@
     <string name="charging_time">Charging time</string>
     <string name="battery_time">Battery time</string>
     <string name="averages">Average values</string>
+    <string name="unknown_value">\?</string>
 </resources>
