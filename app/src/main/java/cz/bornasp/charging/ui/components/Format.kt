@@ -83,8 +83,8 @@ fun formatDuration(seconds: Long): String {
 
     return when {
         days != 0L -> stringResource(R.string.time_days_hours, days, hours % HOURS_IN_DAY)
-        hours != 0L -> stringResource(R.string.timeHoursMinutes, hours, minutes % MINUTES_IN_HOUR)
-        minutes != 0L -> stringResource(R.string.timeMinutes, minutes)
-        else -> stringResource(R.string.timeSeconds, seconds)
+        hours != 0L -> stringResource(R.string.time_hours_minutes, hours, minutes % MINUTES_IN_HOUR)
+        minutes != 0L -> stringResource(R.string.time_minutes, minutes)
+        else -> stringResource(R.string.time_seconds, seconds)
     }
 }
