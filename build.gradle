@@ -5,6 +5,12 @@ buildscript {
         room_version = '2.5.0'
         detekt_version = '1.22.0'
     }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'org.yaml', name: 'snakeyaml', version: '1.33'
+    }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id 'com.android.application' version '7.4.1' apply false

@@ -1,3 +1,5 @@
+import org.yaml.snakeyaml.Yaml
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -5,7 +7,18 @@ plugins {
     id 'io.gitlab.arturbosch.detekt'
 }
 
+def keystoreConfigFile = rootProject.file("keystore.yml")
+def keystoreConfig = new Yaml().load(keystoreConfigFile.newInputStream())
+
 android {
+    signingConfigs {
+        release {
+            storeFile file(keystoreConfig['storeFile'])
+            storePassword keystoreConfig['storePassword']
+            keyAlias keystoreConfig['keyAlias']
+            keyPassword keystoreConfig['keyPassword']
+        }
+    }
     namespace 'cz.bornasp.charging'
     compileSdk 33
 
@@ -24,8 +37,16 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+            minifyEnabled false
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
