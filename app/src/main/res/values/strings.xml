@@ -40,4 +40,12 @@
     <string name="battery_time">Battery time</string>
     <string name="averages">Average values</string>
     <string name="unknown_value">\?</string>
+
+    <string name="charge_alarm_title">Charge Alarm</string>
+    <string name="charge_alarm_description">Get notified of battery charge, so you\'re not plugged in any longer than it\'s necessary.</string>
+    <string name="charge_alarm_target">Target charge: %1$s</string>
+    <string name="cancel">Cancel</string>
+    <string name="disable_charge_alarm">Disable</string>
+    <string name="update">Update</string>
+    <string name="enable_charge_alarm">Set up</string>
 </resources>

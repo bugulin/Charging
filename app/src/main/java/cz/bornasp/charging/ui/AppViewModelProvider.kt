@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import cz.bornasp.charging.ChargingApplication
 import cz.bornasp.charging.ui.AppViewModelProvider.Factory
+import cz.bornasp.charging.ui.chargealarm.ChargeAlarmViewModel
 import cz.bornasp.charging.ui.history.HistoryViewModel
 import cz.bornasp.charging.ui.home.HomeViewModel
 import cz.bornasp.charging.ui.statistics.StatisticsViewModel
@@ -24,6 +25,9 @@ object AppViewModelProvider {
         }
         initializer {
             StatisticsViewModel(chargingApplication().container.batteryChargingSessionRepository)
+        }
+        initializer {
+            ChargeAlarmViewModel(chargingApplication().container.userPreferencesRepository)
         }
     }
 }
