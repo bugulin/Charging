@@ -3,6 +3,7 @@ package cz.bornasp.charging.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -13,7 +14,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -37,6 +38,8 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+val AppIcons = Icons.Default
+
 @Composable
 fun ChargingTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -55,8 +58,12 @@ fun ChargingTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
+            val window = (view.context as Activity).window
+            val insets = WindowCompat.getInsetsController(window, view)
+            window.statusBarColor = colorScheme.primary.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
+            insets.isAppearanceLightStatusBars = darkTheme
+            insets.isAppearanceLightNavigationBars = !darkTheme
         }
     }
 
