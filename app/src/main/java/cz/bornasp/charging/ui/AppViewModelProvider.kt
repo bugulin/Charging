@@ -18,7 +18,10 @@ import cz.bornasp.charging.ui.statistics.StatisticsViewModel
 object AppViewModelProvider {
     val Factory = viewModelFactory {
         initializer {
-            HomeViewModel(chargingApplication().container.batteryChargingSessionRepository)
+            HomeViewModel(
+                chargingApplication().container.batteryChargingSessionRepository,
+                chargingApplication().container.userPreferencesRepository
+            )
         }
         initializer {
             HistoryViewModel(chargingApplication().container.batteryChargingSessionRepository)
