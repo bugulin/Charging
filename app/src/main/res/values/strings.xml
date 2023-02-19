@@ -26,6 +26,7 @@
     <string name="service_channel_description">Mandatory notification that the foreground service is running.</string>
     <string name="charge_monitor_notification_title">Charge monitor is running</string>
     <string name="charge_monitor_notification_text">This service watches battery status.</string>
+    <string name="alarm_channel_description">Notifications that certain battery level has been reached.</string>
 
     <string name="statistics">Statistics</string>
     <string name="refresh">Refresh</string>
@@ -48,4 +49,6 @@
     <string name="disable_charge_alarm">Disable</string>
     <string name="update">Update</string>
     <string name="enable_charge_alarm">Set up</string>
+    <string name="battery_charged">Battery charged!</string>
+    <string name="battery_charged_description">You can now unplug the device.</string>
 </resources>

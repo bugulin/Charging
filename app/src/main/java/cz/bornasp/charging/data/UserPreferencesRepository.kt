@@ -16,6 +16,7 @@ private const val TAG = "UserPreferencesRepo"
 
 const val DEFAULT_CHARGE_ALARM_TARGET = 1f
 const val DEFAULT_CHARGE_ALARM_ENABLED = false
+const val DEFAULT_CHARGE_ALARM_WENT_OFF = true
 
 /**
  * Repository that stores user preferences.
@@ -49,6 +50,23 @@ class UserPreferencesRepository(
             preferences[CHARGE_ALARM_ENABLED] ?: DEFAULT_CHARGE_ALARM_ENABLED
         }
 
+    val chargeAlarmInformation: Flow<ChargeAlarmInformation> = dataStore.data
+        .catch {
+            if (it is IOException) {
+                Log.e(TAG, "Error reading preferences.", it)
+                emit(emptyPreferences())
+            } else {
+                throw it
+            }
+        }
+        .map { preferences ->
+            ChargeAlarmInformation(
+                isEnabled = preferences[CHARGE_ALARM_ENABLED] ?: DEFAULT_CHARGE_ALARM_ENABLED,
+                targetCharge = preferences[CHARGE_ALARM_TARGET] ?: DEFAULT_CHARGE_ALARM_TARGET,
+                wentOff = preferences[CHARGE_ALARM_WENT_OFF] ?: DEFAULT_CHARGE_ALARM_WENT_OFF
+            )
+        }
+
     suspend fun updateChargeAlarm(isEnabled: Boolean, target: Float?) {
         dataStore.edit { preferences ->
             preferences[CHARGE_ALARM_ENABLED] = isEnabled
@@ -56,8 +74,15 @@ class UserPreferencesRepository(
         }
     }
 
+    suspend fun setChargeAlarmWentOff(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[CHARGE_ALARM_WENT_OFF] = value
+        }
+    }
+
     private companion object {
         val CHARGE_ALARM_ENABLED = booleanPreferencesKey("charge_alarm_enabled")
         val CHARGE_ALARM_TARGET = floatPreferencesKey("charge_alarm_target")
+        val CHARGE_ALARM_WENT_OFF = booleanPreferencesKey("charge_alarm_rang")
     }
 }

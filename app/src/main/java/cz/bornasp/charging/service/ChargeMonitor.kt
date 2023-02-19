@@ -1,8 +1,6 @@
 package cz.bornasp.charging.service
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -15,17 +13,18 @@ import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import cz.bornasp.charging.R
+import cz.bornasp.charging.broadcasts.ChargeAlarm
 import cz.bornasp.charging.data.AppDataContainer
 import cz.bornasp.charging.data.BatteryChargingSession
-import kotlinx.coroutines.Dispatchers
+import cz.bornasp.charging.helpers.SERVICE_NOTIFICATION_CHANNEL
+import cz.bornasp.charging.helpers.createNotificationChannel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.time.OffsetDateTime
 
 const val TO_PERCENTAGE = 100
 private const val TAG = "ChargeMonitor"
-private const val SERVICE_NOTIFICATION_CHANNEL = "charge-monitor"
 
 class ChargeMonitor : Service() {
     private lateinit var powerBroadcastReceiver: PowerBroadcastReceiver
@@ -60,7 +59,7 @@ class ChargeMonitor : Service() {
         super.onCreate()
         Log.d(TAG, "Service created")
 
-        createNotificationChannel()
+        createNotificationChannel(this)
         registerBroadcastReceiver()
     }
 
@@ -68,22 +67,6 @@ class ChargeMonitor : Service() {
         unregisterReceiver(powerBroadcastReceiver)
         super.onDestroy()
         Log.d(TAG, "Service destroyed")
-    }
-
-    /**
-     * Ensure that the channel of foreground service's mandatory notification exists.
-     */
-    private fun createNotificationChannel() {
-        val serviceChannel = NotificationChannel(
-            SERVICE_NOTIFICATION_CHANNEL,
-            getString(R.string.service_channel_name),
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = getString(R.string.service_channel_description)
-            setShowBadge(false)
-        }
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(serviceChannel)
     }
 
     /**
@@ -115,46 +98,58 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
         runBlocking {
             launch {
                 when (intent.action) {
-                    Intent.ACTION_POWER_CONNECTED -> createSession(context, batteryPercentage)
-                    Intent.ACTION_POWER_DISCONNECTED -> endSession(context, batteryPercentage)
+                    Intent.ACTION_POWER_CONNECTED -> {
+                        createSession(context, batteryPercentage)
+                        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                            context.registerReceiver(chargeAlarm, ifilter)
+                        }
+                    }
+                    Intent.ACTION_POWER_DISCONNECTED -> {
+                        endSession(context, batteryPercentage)
+                        try {
+                            context.unregisterReceiver(chargeAlarm)
+                        } catch (e: IllegalArgumentException) {
+                            Log.d(TAG, "Could not unregister receiver: $e")
+                        }
+                    }
                 }
             }
         }
-        Log.d(TAG, "Action: ${intent.action} ($batteryPercentage%}")
+        Log.d(TAG, "Action: ${intent.action} ($batteryPercentage%)")
     }
 
     private suspend fun createSession(context: Context, batteryPercentage: Float?) {
         val repository = AppDataContainer(context).batteryChargingSessionRepository
-        withContext(Dispatchers.IO) {
+        repository.insertRecord(
+            BatteryChargingSession(
+                startTime = OffsetDateTime.now(),
+                initialChargePercentage = batteryPercentage
+            )
+        )
+    }
+
+    private suspend fun endSession(context: Context, batteryPercentage: Float?) {
+        val repository = AppDataContainer(context).batteryChargingSessionRepository
+        val session = repository.getLastRecordStream().first()
+        if (session == null || session.endTime != null) {
+            // We missed current session's start
             repository.insertRecord(
                 BatteryChargingSession(
-                    startTime = OffsetDateTime.now(),
-                    initialChargePercentage = batteryPercentage
+                    endTime = OffsetDateTime.now(),
+                    finalChargePercentage = batteryPercentage
+                )
+            )
+        } else {
+            repository.updateRecord(
+                session.copy(
+                    endTime = OffsetDateTime.now(),
+                    finalChargePercentage = batteryPercentage
                 )
             )
         }
     }
 
-    private suspend fun endSession(context: Context, batteryPercentage: Float?) {
-        val repository = AppDataContainer(context).batteryChargingSessionRepository
-        withContext(Dispatchers.IO) {
-            val session = repository.getLastRecord()
-            if (session == null || session.endTime != null) {
-                // We missed current session's start
-                repository.insertRecord(
-                    BatteryChargingSession(
-                        endTime = OffsetDateTime.now(),
-                        finalChargePercentage = batteryPercentage
-                    )
-                )
-            } else {
-                repository.updateRecord(
-                    session.copy(
-                        endTime = OffsetDateTime.now(),
-                        finalChargePercentage = batteryPercentage
-                    )
-                )
-            }
-        }
+    companion object {
+        val chargeAlarm = ChargeAlarm()
     }
 }
