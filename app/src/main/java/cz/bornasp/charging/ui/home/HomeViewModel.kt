@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.bornasp.charging.data.BatteryChargingSession
 import cz.bornasp.charging.data.BatteryChargingSessionRepository
+import cz.bornasp.charging.data.UserPreferencesRepository
 import cz.bornasp.charging.service.TO_PERCENTAGE
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +19,10 @@ import kotlinx.coroutines.flow.update
 /**
  * View model with current battery status and all battery charging sessions in the database.
  */
-class HomeViewModel(sessionRepository: BatteryChargingSessionRepository) : ViewModel() {
+class HomeViewModel(
+    sessionRepository: BatteryChargingSessionRepository,
+    userPreferencesRepository: UserPreferencesRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -30,6 +34,13 @@ class HomeViewModel(sessionRepository: BatteryChargingSessionRepository) : ViewM
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = null
             )
+
+    val isChargeAlarmEnabled: StateFlow<Boolean> = userPreferencesRepository.isChargeAlarmEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = true
+        )
 
     /**
      * Update displayed information about battery status.

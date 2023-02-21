@@ -5,6 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import cz.bornasp.charging.ui.chargealarm.ChargeAlarmDestination
+import cz.bornasp.charging.ui.chargealarm.ChargeAlarmScreen
 import cz.bornasp.charging.ui.history.HistoryDestination
 import cz.bornasp.charging.ui.history.HistoryScreen
 import cz.bornasp.charging.ui.home.HomeDestination
@@ -24,7 +26,7 @@ fun ChargingNavHost(
     ) {
         composable(route = HomeDestination.route) {
             HomeScreen(
-                navigateToChargeAlarm = { },
+                navigateToChargeAlarm = { navController.navigate(ChargeAlarmDestination.route) },
                 navigateToHistory = { navController.navigate(HistoryDestination.route) },
                 navigateToStatistics = { navController.navigate(StatisticsDestination.route) }
             )
@@ -34,6 +36,12 @@ fun ChargingNavHost(
         }
         composable(route = StatisticsDestination.route) {
             StatisticsScreen(navigateUp = { navController.navigateUp() })
+        }
+        composable(route = ChargeAlarmDestination.route) {
+            ChargeAlarmScreen(
+                onCancel = { navController.navigateUp() },
+                onSave = { navController.navigate(HomeDestination.route) }
+            )
         }
     }
 }
