@@ -2,6 +2,7 @@ package cz.bornasp.charging.broadcasts
 
 import android.Manifest
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.os.BatteryManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
+import cz.bornasp.charging.MainActivity
 import cz.bornasp.charging.R
 import cz.bornasp.charging.data.AppDataContainer
 import cz.bornasp.charging.helpers.ALARM_NOTIFICATION_CHANNEL
@@ -50,6 +52,9 @@ class ChargeAlarm : BroadcastReceiver() {
         } else if (information.wentOff) {
             // Reset the alarm
             container.userPreferencesRepository.setChargeAlarmWentOff(false)
+            with(NotificationManagerCompat.from(context)) {
+                cancel(ALARM_NOTIFICATION_ID)
+            }
         }
     }
 
@@ -58,11 +63,22 @@ class ChargeAlarm : BroadcastReceiver() {
      * @return Whether the user was notified.
      */
     private fun notify(context: Context): Boolean {
+        val pendingIntent: PendingIntent =
+            Intent(context, MainActivity::class.java).let { notificationIntent ->
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    notificationIntent,
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            }
         val notification = Notification.Builder(context, ALARM_NOTIFICATION_CHANNEL)
             .setContentTitle(context.getString(R.string.battery_charged))
             .setContentText(context.getString(R.string.battery_charged_description))
             .setSmallIcon(R.drawable.notification_charge_alarm)
             .setCategory(Notification.CATEGORY_ALARM)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true)
             .build()
 
         if (
@@ -73,7 +89,9 @@ class ChargeAlarm : BroadcastReceiver() {
             return false
         }
 
-        NotificationManagerCompat.from(context).notify(ALARM_NOTIFICATION_ID, notification)
+        with(NotificationManagerCompat.from(context)) {
+            notify(ALARM_NOTIFICATION_ID, notification)
+        }
         return true
     }
 }

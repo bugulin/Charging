@@ -12,11 +12,14 @@ import android.os.BatteryManager
 import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import cz.bornasp.charging.R
 import cz.bornasp.charging.broadcasts.ChargeAlarm
 import cz.bornasp.charging.data.AppDataContainer
 import cz.bornasp.charging.data.BatteryChargingSession
+import cz.bornasp.charging.helpers.ALARM_NOTIFICATION_ID
 import cz.bornasp.charging.helpers.SERVICE_NOTIFICATION_CHANNEL
+import cz.bornasp.charging.helpers.SERVICE_NOTIFICATION_ID
 import cz.bornasp.charging.helpers.createNotificationChannel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -50,7 +53,7 @@ class ChargeMonitor : Service() {
             .setContentText(getString(R.string.charge_monitor_notification_text))
             .setContentIntent(pendingIntent)
             .build()
-        startForeground(startId, notification)
+        startForeground(SERVICE_NOTIFICATION_ID, notification)
 
         return START_STICKY
     }
@@ -106,6 +109,10 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
                     }
                     Intent.ACTION_POWER_DISCONNECTED -> {
                         endSession(context, batteryPercentage)
+                        // Cancel the charge alarm if triggered
+                        with(NotificationManagerCompat.from(context)) {
+                            cancel(ALARM_NOTIFICATION_ID)
+                        }
                         try {
                             context.unregisterReceiver(chargeAlarm)
                         } catch (e: IllegalArgumentException) {

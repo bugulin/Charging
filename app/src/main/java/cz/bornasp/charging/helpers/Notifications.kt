@@ -10,6 +10,7 @@ const val ALARM_NOTIFICATION_CHANNEL = "charge-alarm"
 const val SERVICE_NOTIFICATION_CHANNEL = "charge-monitor"
 
 const val ALARM_NOTIFICATION_ID = 1
+const val SERVICE_NOTIFICATION_ID = 2
 
 /**
  * Ensure that the demanded notification channels exist.

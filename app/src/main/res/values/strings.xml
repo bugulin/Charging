@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Charging</string>
     <string name="back">Go back</string>
-    <string name="charge_alarm">Battery charge alarm</string>
+    <string name="charge_alarm">Charge alarm</string>
     <string name="history">Charging history</string>
 
     <string name="current_charging_time">Charging %s</string>
@@ -22,11 +22,11 @@
 
     <string name="no_history">Once you start charging your device,\na new record will appear here.</string>
 
-    <string name="service_channel_name">Foreground service</string>
-    <string name="service_channel_description">Mandatory notification that the foreground service is running.</string>
-    <string name="charge_monitor_notification_title">Charge monitor is running</string>
-    <string name="charge_monitor_notification_text">This service watches battery status.</string>
-    <string name="alarm_channel_description">Notifications that certain battery level has been reached.</string>
+    <string name="service_channel_name">Charge monitor</string>
+    <string name="service_channel_description">Mandatory notification indicating that the foreground service is running.</string>
+    <string name="charge_monitor_notification_title">Charge Monitor is running</string>
+    <string name="charge_monitor_notification_text">This service monitors your battery.</string>
+    <string name="alarm_channel_description">Notification that the selected battery level has been reached. Needed only when you have the charge alarm enabled.</string>
 
     <string name="statistics">Statistics</string>
     <string name="refresh">Refresh</string>
