@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material3.Button
@@ -50,6 +51,7 @@ object ChargeAlarmDestination : NavigationDestination {
 fun ChargeAlarmScreen(
     onSave: () -> Unit,
     onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ChargeAlarmViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     ChargeAlarmScreenContent(
@@ -59,7 +61,8 @@ fun ChargeAlarmScreen(
         },
         onCancel = onCancel,
         onSliderValueChange = { viewModel.updateSlider(it) },
-        uiState = viewModel.uiState
+        uiState = viewModel.uiState,
+        modifier = modifier.systemBarsPadding()
     )
 }
 
@@ -68,10 +71,11 @@ fun ChargeAlarmScreenContent(
     onSave: (Boolean) -> Unit,
     onCancel: () -> Unit,
     onSliderValueChange: (Float) -> Unit,
-    uiState: ChargeAlarmUiState
+    uiState: ChargeAlarmUiState,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally

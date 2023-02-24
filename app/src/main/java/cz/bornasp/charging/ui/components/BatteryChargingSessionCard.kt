@@ -66,7 +66,7 @@ fun BatteryChargingSessionCard(record: BatteryChargingSession, modifier: Modifie
                 ) {
                     PercentageDifferenceText(
                         value = record.finalChargePercentage - record.initialChargePercentage,
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
@@ -77,7 +77,7 @@ fun BatteryChargingSessionCard(record: BatteryChargingSession, modifier: Modifie
                             R.string.duration,
                             formatDuration(timeCharging.seconds)
                         ),
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 }
             }
