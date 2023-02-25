@@ -71,7 +71,7 @@ fun StatisticsScreen(
                     IconButton(onClick = navigateUp) {
                         Icon(
                             imageVector = AppIcons.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            contentDescription = stringResource(R.string.navigation_back_button)
                         )
                     }
                 },
@@ -106,7 +106,7 @@ fun Statistics(
     val chargingTime = statistics.totalChargingTimeInSeconds / statistics.completeSessionCount
     val totalItems = listOf(
         Pair(
-            R.string.charging_sessions,
+            R.string.charging_session_count,
             if (statistics.sessionCount == statistics.completeSessionCount) {
                 statistics.sessionCount.toString()
             } else {
@@ -185,7 +185,7 @@ private fun Item(
         trailingContent = {
             if (value == null) {
                 Text(
-                    text = stringResource(R.string.unknown),
+                    text = stringResource(R.string.unknown_value),
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Normal
                 )
