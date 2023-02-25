@@ -191,8 +191,8 @@ fun ChargeAlarmPreview() {
             onSliderValueChange = { },
             uiState = ChargeAlarmUiState(
                 isEnabled = true,
-                sliderValue = 80f,
-                targetBatteryPercentage = 100f
+                sliderValue = .8f,
+                targetBatteryPercentage = 1f
             )
         )
     }

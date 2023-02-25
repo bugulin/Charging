@@ -33,7 +33,7 @@ fun FromToText(from: String, to: String, style: TextStyle, modifier: Modifier = 
     val text = buildAnnotatedString {
         append(from)
         append(" ")
-        appendInlineContent(arrowId, stringResource(R.string.to))
+        appendInlineContent(arrowId, stringResource(R.string.arrow_forward_description))
         append(" ")
         append(to)
     }
@@ -45,7 +45,7 @@ fun FromToText(from: String, to: String, style: TextStyle, modifier: Modifier = 
                 placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter
             ),
             children = {
-                Icon(AppIcons.ArrowForward, stringResource(R.string.to))
+                Icon(AppIcons.ArrowForward, stringResource(R.string.arrow_forward_description))
             }
         )
     )
@@ -60,7 +60,7 @@ fun FromToText(from: String, to: String, style: TextStyle, modifier: Modifier = 
 @Composable
 fun PercentageDifferenceText(value: Float, style: TextStyle, modifier: Modifier = Modifier) {
     Text(
-        text = stringResource(R.string.percentage_difference, value),
+        text = stringResource(R.string.percentage_signed, value),
         modifier = modifier,
         color = when {
             value > 0 -> MaterialTheme.colorScheme.primary

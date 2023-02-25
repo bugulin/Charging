@@ -1,6 +1,5 @@
 package cz.bornasp.charging.ui.history
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -77,7 +76,7 @@ fun HistoryScreen(
                     IconButton(onClick = navigateUp) {
                         Icon(
                             imageVector = AppIcons.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            contentDescription = stringResource(R.string.navigation_back_button)
                         )
                     }
                 },
@@ -111,8 +110,9 @@ fun BatteryChargingSessionList(
 ) {
     if (sessionList.isEmpty()) {
         Column(
-            modifier = modifier.padding(contentPadding),
-            verticalArrangement = Arrangement.Center,
+            modifier = modifier
+                .padding(contentPadding)
+                .padding(top = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
