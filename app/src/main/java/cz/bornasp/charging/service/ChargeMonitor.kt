@@ -21,9 +21,12 @@ import cz.bornasp.charging.helpers.ALARM_NOTIFICATION_ID
 import cz.bornasp.charging.helpers.SERVICE_NOTIFICATION_CHANNEL
 import cz.bornasp.charging.helpers.SERVICE_NOTIFICATION_ID
 import cz.bornasp.charging.helpers.createNotificationChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.time.OffsetDateTime
 
 const val TO_PERCENTAGE = 100
@@ -89,6 +92,7 @@ class ChargeMonitor : Service() {
 }
 
 private class PowerBroadcastReceiver : BroadcastReceiver() {
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob())
 
     override fun onReceive(context: Context, intent: Intent?) {
         val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
@@ -100,33 +104,31 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
             level * TO_PERCENTAGE / scale.toFloat()
         }
 
-        runBlocking {
-            launch {
-                when (intent?.action) {
-                    Intent.ACTION_POWER_CONNECTED -> {
-                        createSession(context, batteryPercentage)
+        coroutineScope.launch {
+            when (intent?.action) {
+                Intent.ACTION_POWER_CONNECTED -> {
+                    createSession(context, batteryPercentage)
+                    registerChargeAlarm(context)
+                }
+                Intent.ACTION_POWER_DISCONNECTED -> {
+                    endSession(context, batteryPercentage)
+                    // Cancel the charge alarm if triggered
+                    with(NotificationManagerCompat.from(context)) {
+                        cancel(ALARM_NOTIFICATION_ID)
+                    }
+                    // Receiving broadcasts for the charge alarm will only drain battery
+                    unregisterChargeAlarm(context)
+                }
+                else -> {
+                    // Try to register the charge alarm in a situation when the intent
+                    // ACTION_POWER_CONNECTED was missed (i.e. after reboot)
+                    val chargePlug: Int = batteryStatus?.getIntExtra(
+                        BatteryManager.EXTRA_PLUGGED,
+                        BATTERY_UNPLUGGED
+                    ) ?: BATTERY_UNPLUGGED
+                    Log.d(TAG, "chargePlug = $chargePlug")
+                    if (chargePlug != BATTERY_UNPLUGGED) {
                         registerChargeAlarm(context)
-                    }
-                    Intent.ACTION_POWER_DISCONNECTED -> {
-                        endSession(context, batteryPercentage)
-                        // Cancel the charge alarm if triggered
-                        with(NotificationManagerCompat.from(context)) {
-                            cancel(ALARM_NOTIFICATION_ID)
-                        }
-                        // Receiving broadcasts for the charge alarm will only drain battery
-                        unregisterChargeAlarm(context)
-                    }
-                    else -> {
-                        // Try to register the charge alarm in a situation when the intent
-                        // ACTION_POWER_CONNECTED was missed (i.e. after reboot)
-                        val chargePlug: Int = batteryStatus?.getIntExtra(
-                            BatteryManager.EXTRA_PLUGGED,
-                            BATTERY_UNPLUGGED
-                        ) ?: BATTERY_UNPLUGGED
-                        Log.d(TAG, "chargePlug = $chargePlug")
-                        if (chargePlug != BATTERY_UNPLUGGED) {
-                            registerChargeAlarm(context)
-                        }
                     }
                 }
             }
@@ -156,36 +158,38 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    private suspend fun createSession(context: Context, batteryPercentage: Float?) {
-        val repository = AppDataContainer(context).batteryChargingSessionRepository
-        repository.insertRecord(
-            BatteryChargingSession(
-                startTime = OffsetDateTime.now(),
-                initialChargePercentage = batteryPercentage
-            )
-        )
-    }
-
-    private suspend fun endSession(context: Context, batteryPercentage: Float?) {
-        val repository = AppDataContainer(context).batteryChargingSessionRepository
-        val session = repository.getLastRecordStream().first()
-        if (session == null || session.endTime != null) {
-            // We missed current session's start
+    private suspend fun createSession(context: Context, batteryPercentage: Float?) =
+        withContext(Dispatchers.IO) {
+            val repository = AppDataContainer(context).batteryChargingSessionRepository
             repository.insertRecord(
                 BatteryChargingSession(
-                    endTime = OffsetDateTime.now(),
-                    finalChargePercentage = batteryPercentage
-                )
-            )
-        } else {
-            repository.updateRecord(
-                session.copy(
-                    endTime = OffsetDateTime.now(),
-                    finalChargePercentage = batteryPercentage
+                    startTime = OffsetDateTime.now(),
+                    initialChargePercentage = batteryPercentage
                 )
             )
         }
-    }
+
+    private suspend fun endSession(context: Context, batteryPercentage: Float?) =
+        withContext(Dispatchers.IO) {
+            val repository = AppDataContainer(context).batteryChargingSessionRepository
+            val session = repository.getLastRecordStream().first()
+            if (session == null || session.endTime != null) {
+                // We missed current session's start
+                repository.insertRecord(
+                    BatteryChargingSession(
+                        endTime = OffsetDateTime.now(),
+                        finalChargePercentage = batteryPercentage
+                    )
+                )
+            } else {
+                repository.updateRecord(
+                    session.copy(
+                        endTime = OffsetDateTime.now(),
+                        finalChargePercentage = batteryPercentage
+                    )
+                )
+            }
+        }
 
     companion object {
         val chargeAlarm = ChargeAlarm()

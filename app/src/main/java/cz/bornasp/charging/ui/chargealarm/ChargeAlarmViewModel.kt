@@ -11,6 +11,7 @@ import cz.bornasp.charging.data.UserPreferencesRepository
 import cz.bornasp.charging.helpers.percent
 import cz.bornasp.charging.helpers.toPercentage
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -25,14 +26,16 @@ class ChargeAlarmViewModel(
 
     init {
         viewModelScope.launch {
-            val isEnabled = async { userPreferencesRepository.isChargeAlarmEnabled.first() }
-            val target = async { userPreferencesRepository.chargeAlarmTarget.first() }
+            coroutineScope {
+                val isEnabled = async { userPreferencesRepository.isChargeAlarmEnabled.first() }
+                val target = async { userPreferencesRepository.chargeAlarmTarget.first() }
 
-            uiState = ChargeAlarmUiState(
-                isEnabled = isEnabled.await(),
-                sliderValue = target.await(),
-                targetBatteryPercentage = target.await(),
-            )
+                uiState = ChargeAlarmUiState(
+                    isEnabled = isEnabled.await(),
+                    sliderValue = target.await(),
+                    targetBatteryPercentage = target.await(),
+                )
+            }
         }
     }
 
