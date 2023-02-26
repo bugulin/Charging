@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.filled.AlarmAdd
+import androidx.compose.material.icons.filled.AlarmOn
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,8 +67,9 @@ fun HomeScreen(
     HomeScreenContent(
         title = title,
         message = getLastEventMessage(lastCharging),
-        modifier = modifier,
+        modifier = modifier.systemBarsPadding(),
         uiState = uiState,
+        isChargeAlarmEnabled = viewModel.isChargeAlarmEnabled.collectAsState().value,
         navigateToChargeAlarm = navigateToChargeAlarm,
         navigateToHistory = navigateToHistory,
         navigateToStatistics = navigateToStatistics
@@ -80,6 +83,7 @@ fun HomeScreenContent(
     message: String?,
     modifier: Modifier,
     uiState: HomeUiState,
+    isChargeAlarmEnabled: Boolean,
     navigateToChargeAlarm: () -> Unit,
     navigateToHistory: () -> Unit,
     navigateToStatistics: () -> Unit
@@ -100,7 +104,8 @@ fun HomeScreenContent(
             actions = {
                 IconButton(onClick = navigateToChargeAlarm) {
                     Icon(
-                        imageVector = AppIcons.AlarmAdd,
+                        imageVector =
+                        if (isChargeAlarmEnabled) AppIcons.AlarmOn else AppIcons.AlarmAdd,
                         contentDescription = stringResource(R.string.charge_alarm)
                     )
                 }
@@ -143,6 +148,7 @@ fun HomeScreenPreview() {
             title = R.string.app_name,
             message = stringResource(R.string.time_from_last_charging, "30 minutes"),
             uiState = HomeUiState(80f, BatteryManager.BATTERY_STATUS_CHARGING, true),
+            isChargeAlarmEnabled = true,
             modifier = Modifier
         )
     }

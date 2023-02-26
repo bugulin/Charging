@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import cz.bornasp.charging.service.ChargeMonitor
@@ -24,6 +25,9 @@ class MainActivity : ComponentActivity() {
         Intent(this, ChargeMonitor::class.java).also { intent ->
             applicationContext.startForegroundService(intent)
         }
+
+        // Enable edge-to-edge experience: let the application draw behind the system bars
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             ChargingTheme {

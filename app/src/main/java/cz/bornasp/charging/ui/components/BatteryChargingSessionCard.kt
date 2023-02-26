@@ -23,7 +23,7 @@ import java.time.format.FormatStyle
 fun BatteryChargingSessionCard(record: BatteryChargingSession, modifier: Modifier = Modifier) {
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
     val sessionTimestamp = record.startTime?.format(formatter)
-        ?: (record.endTime?.format(formatter) ?: stringResource(R.string.unknown_value))
+        ?: (record.endTime?.format(formatter) ?: stringResource(R.string.unknown_number))
 
     Card(
         modifier = modifier
@@ -42,12 +42,12 @@ fun BatteryChargingSessionCard(record: BatteryChargingSession, modifier: Modifie
                     from = if (record.initialChargePercentage != null) {
                         stringResource(R.string.percentage, record.initialChargePercentage)
                     } else {
-                        stringResource(R.string.unknown_value)
+                        stringResource(R.string.unknown_number)
                     },
                     to = if (record.finalChargePercentage != null) {
                         stringResource(R.string.percentage, record.finalChargePercentage)
                     } else {
-                        stringResource(R.string.unknown_value)
+                        stringResource(R.string.unknown_number)
                     },
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(end = 8.dp)
@@ -66,7 +66,7 @@ fun BatteryChargingSessionCard(record: BatteryChargingSession, modifier: Modifie
                 ) {
                     PercentageDifferenceText(
                         value = record.finalChargePercentage - record.initialChargePercentage,
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.padding(end = 8.dp)
                     )
                 }
@@ -74,10 +74,10 @@ fun BatteryChargingSessionCard(record: BatteryChargingSession, modifier: Modifie
                     val timeCharging = Duration.between(record.startTime, record.endTime)
                     Text(
                         text = stringResource(
-                            R.string.duration,
+                            R.string.charging_session_duration,
                             formatDuration(timeCharging.seconds)
                         ),
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.headlineSmall
                     )
                 }
             }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Nabíjení</string>
+    <string name="navigation_back_button">Zpět</string>
+    <string name="history">Historie nabíjení</string>
+    <string name="current_charging_time">Nabíjení <xliff:g id="time" example="10 minut">%s</xliff:g></string>
+    <string name="charging_session_duration">za <xliff:g id="time" example="40 minut">%s</xliff:g></string>
+    <string name="time_from_last_charging"><xliff:g id="time" example="30 minut">%s</xliff:g> od posledního nabíjení</string>
+    <string name="time_minutes">%d\u2009min</string>
+    <string name="charging">Nabíjení</string>
+    <string name="discharging">Vybíjení</string>
+    <string name="fully_charged">Plně nabito</string>
+    <string name="not_charging">Nenabíjí se</string>
+    <string name="service_channel_name">Sledovač nabíjení</string>
+    <string name="service_channel_description">Povinné oznámení o tom, že služba v popředí běží.</string>
+    <string name="charge_monitor_notification_title">Sledovač nabíjení běží</string>
+    <string name="charge_monitor_notification_text">Tato služba monitoruje stav baterie.</string>
+    <string name="alarm_channel_description">Oznámení, že jste dosáhli vybrané úrovně nabití. Potřeba pouze pokud je alarm nabíjení zapnutý.</string>
+    <string name="statistics">Statistiky</string>
+    <string name="refresh">Znovu načíst</string>
+    <string name="arrow_forward_description">až</string>
+    <string name="unknown_value">neznámé</string>
+    <string name="charging_session_count">Počet nabíjení</string>
+    <string name="total_charge_percentage">Dohromady nabito</string>
+    <string name="initial_charge">Počáteční hladina baterie</string>
+    <string name="total_charging_time">Celkový čas nabíjení</string>
+    <string name="final_charge">Konečná hladina baterie</string>
+    <string name="charging_time">Doba nabíjení</string>
+    <string name="averages">Průměrné hodnoty</string>
+    <string name="charge_alarm_description">Dostávejte upozornění ohledně nabití, abyste nemuseli nabíjet déle, než je potřeba.</string>
+    <string name="charge_alarm_target">Cílová hladina baterie: <xliff:g id="percentage">%1$s</xliff:g></string>
+    <string name="cancel">Zrušit</string>
+    <string name="update">Aktualizovat</string>
+    <string name="enable_charge_alarm">Zapnout</string>
+    <string name="battery_charged">Nabito!</string>
+    <string name="battery_charged_description">Nyní můžete zařízení odpojit.</string>
+    <string name="charge_alarm">Alarm nabití</string>
+    <string name="battery_time">Doba provozu na baterii</string>
+    <string name="unknown_number">\?</string>
+    <string name="charge_alarm_title">Alarm nabití</string>
+    <string name="disable_charge_alarm">Vypnout</string>
+    <string name="no_history">Jakmile začnete zařízení nabíjet,\nobjeví se zde nový záznam.</string>
+</resources>

@@ -1,11 +1,16 @@
 package cz.bornasp.charging.ui.history
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
@@ -37,6 +42,7 @@ import cz.bornasp.charging.ui.AppViewModelProvider
 import cz.bornasp.charging.ui.components.BatteryChargingSessionCard
 import cz.bornasp.charging.ui.navigation.NavigationDestination
 import cz.bornasp.charging.ui.theme.AppIcons
+import cz.bornasp.charging.ui.theme.ChargingTheme
 import java.time.OffsetDateTime
 
 object HistoryDestination : NavigationDestination {
@@ -55,7 +61,8 @@ fun HistoryScreen(
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
                 title = {
@@ -69,7 +76,7 @@ fun HistoryScreen(
                     IconButton(onClick = navigateUp) {
                         Icon(
                             imageVector = AppIcons.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            contentDescription = stringResource(R.string.navigation_back_button)
                         )
                     }
                 },
@@ -79,13 +86,18 @@ fun HistoryScreen(
                     scrollBehavior
                 }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.systemBars
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
     ) { innerPadding ->
         BatteryChargingSessionList(
             sessionList = historyUiState.sessionList,
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
+            contentPadding = WindowInsets.systemBars
+                .only(WindowInsetsSides.Bottom)
+                .asPaddingValues()
         )
     }
 }
@@ -93,12 +105,14 @@ fun HistoryScreen(
 @Composable
 fun BatteryChargingSessionList(
     sessionList: List<BatteryChargingSession>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     if (sessionList.isEmpty()) {
         Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.Center,
+            modifier = modifier
+                .padding(contentPadding)
+                .padding(top = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -121,11 +135,19 @@ fun BatteryChargingSessionList(
     } else {
         LazyColumn(
             modifier = modifier,
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            contentPadding = contentPadding
         ) {
             items(items = sessionList, key = { it.id }) { record ->
-                BatteryChargingSessionCard(record)
+                Box(
+                    modifier = Modifier.padding(
+                        start = 8.dp,
+                        top = 0.dp,
+                        end = 8.dp,
+                        bottom = 8.dp
+                    )
+                ) {
+                    BatteryChargingSessionCard(record)
+                }
             }
         }
     }
@@ -148,17 +170,19 @@ fun HistoryPreview() {
         Pair(now to null, 50f to null)
     )
 
-    BatteryChargingSessionList(
-        sessionList = data.mapIndexed { index, item ->
-            BatteryChargingSession(
-                id = index,
-                startTime = item.first.first,
-                endTime = item.first.second,
-                initialChargePercentage = item.second.first,
-                finalChargePercentage = item.second.second
-            )
-        }
-    )
+    ChargingTheme {
+        BatteryChargingSessionList(
+            sessionList = data.mapIndexed { index, item ->
+                BatteryChargingSession(
+                    id = index,
+                    startTime = item.first.first,
+                    endTime = item.first.second,
+                    initialChargePercentage = item.second.first,
+                    finalChargePercentage = item.second.second
+                )
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)

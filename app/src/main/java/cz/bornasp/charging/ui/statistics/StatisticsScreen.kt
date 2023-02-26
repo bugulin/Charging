@@ -3,9 +3,13 @@
 package cz.bornasp.charging.ui.statistics
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
@@ -28,7 +32,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cz.bornasp.charging.R
 import cz.bornasp.charging.data.ChargingStatistics
@@ -68,7 +71,7 @@ fun StatisticsScreen(
                     IconButton(onClick = navigateUp) {
                         Icon(
                             imageVector = AppIcons.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            contentDescription = stringResource(R.string.navigation_back_button)
                         )
                     }
                 },
@@ -82,7 +85,9 @@ fun StatisticsScreen(
                 },
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.systemBars
+            .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
     ) { innerPadding ->
         Statistics(
             statistics,
@@ -101,7 +106,7 @@ fun Statistics(
     val chargingTime = statistics.totalChargingTimeInSeconds / statistics.completeSessionCount
     val totalItems = listOf(
         Pair(
-            R.string.charging_sessions,
+            R.string.charging_session_count,
             if (statistics.sessionCount == statistics.completeSessionCount) {
                 statistics.sessionCount.toString()
             } else {
@@ -154,7 +159,9 @@ fun Statistics(
 
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(bottom = 8.dp)
+        contentPadding = WindowInsets.systemBars
+            .only(WindowInsetsSides.Bottom)
+            .asPaddingValues()
     ) {
         items(totalItems) {
             Item(it.first, it.second)
@@ -178,7 +185,7 @@ private fun Item(
         trailingContent = {
             if (value == null) {
                 Text(
-                    text = stringResource(R.string.unknown),
+                    text = stringResource(R.string.unknown_value),
                     fontStyle = FontStyle.Italic,
                     fontWeight = FontWeight.Normal
                 )
@@ -191,7 +198,7 @@ private fun Item(
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun StatisticsPreview() {
     ChargingTheme {

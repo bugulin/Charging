@@ -1,19 +1,19 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Charging</string>
-    <string name="back">Go back</string>
-    <string name="charge_alarm">Battery charge alarm</string>
+    <string name="navigation_back_button">Go back</string>
+    <string name="charge_alarm">Charge alarm</string>
     <string name="history">Charging history</string>
 
-    <string name="current_charging_time">Charging %s</string>
-    <string name="duration">in %s</string>
-    <string name="percentage">%.0f\u200a%%</string>
-    <string name="percentage_difference">%+.0f\u200a%%</string>
-    <string name="time_from_last_charging">%s from last charging</string>
-    <string name="time_days_hours">%1$d\u2009d %2$d\u2009h</string>
-    <string name="time_hours_minutes">%1$d\u2009h %2$d\u2009m</string>
-    <string name="time_minutes">%d\u2009m</string>
-    <string name="time_seconds">%d\u2009s</string>
-    <string name="to">to</string>
+    <string name="current_charging_time">Charging <xliff:g id="time" example="10 minutes">%s</xliff:g></string>
+    <string name="charging_session_duration">in <xliff:g id="time" example="40 minutes">%s</xliff:g></string>
+    <string name="percentage" translatable="false">%.0f\u200a%%</string>
+    <string name="percentage_signed" translatable="false">%+.0f\u200a%%</string>
+    <string name="time_from_last_charging"><xliff:g id="time" example="30 minutes">%s</xliff:g> from last charging</string>
+    <string name="time_days_hours" translatable="false">%1$d\u2009d %2$d\u2009h</string>
+    <string name="time_hours_minutes" translatable="false">%1$d\u2009h %2$d\u2009min</string>
+    <string name="time_minutes">%d\u2009min</string>
+    <string name="time_seconds" translatable="false">%d\u2009s</string>
+    <string name="arrow_forward_description">to</string>
 
     <string name="charging">Charging</string>
     <string name="discharging">Discharging</string>
@@ -22,22 +22,33 @@
 
     <string name="no_history">Once you start charging your device,\na new record will appear here.</string>
 
-    <string name="service_channel_name">Foreground service</string>
-    <string name="service_channel_description">Mandatory notification that the foreground service is running.</string>
-    <string name="charge_monitor_notification_title">Charge monitor is running</string>
-    <string name="charge_monitor_notification_text">This service watches battery status.</string>
+    <string name="service_channel_name">Charge monitor</string>
+    <string name="service_channel_description">Mandatory notification indicating that the foreground service is running.</string>
+    <string name="charge_monitor_notification_title">Charge Monitor is running</string>
+    <string name="charge_monitor_notification_text">This service monitors your battery.</string>
+    <string name="alarm_channel_description">Notification that the selected battery level has been reached. Needed only when you have the charge alarm enabled.</string>
 
     <string name="statistics">Statistics</string>
     <string name="refresh">Refresh</string>
-    <string name="unknown">unknown</string>
-    <string name="charging_sessions">Number of charging sessions</string>
-    <string name="total_charge_percentage">Total battery percentage charged</string>
-    <string name="complete_incomplete_session_count">%1$d (%2$d)</string>
+    <string name="unknown_value">unknown</string>
+    <string name="charging_session_count">Number of charging sessions</string>
+    <string name="total_charge_percentage">Charged in total</string>
+    <string name="complete_incomplete_session_count" translatable="false">%1$d (%2$d)</string>
     <string name="initial_charge">Initial battery percentage</string>
     <string name="total_charging_time">Total charging time</string>
     <string name="final_charge">Final battery percentage</string>
     <string name="charging_time">Charging time</string>
     <string name="battery_time">Battery time</string>
     <string name="averages">Average values</string>
-    <string name="unknown_value">\?</string>
+    <string name="unknown_number">\?</string>
+
+    <string name="charge_alarm_title">Charge Alarm</string>
+    <string name="charge_alarm_description">Get notified of battery charge, so you\'re not plugged in any longer than it\'s necessary.</string>
+    <string name="charge_alarm_target">Target battery level: <xliff:g id="percentage">%1$s</xliff:g></string>
+    <string name="cancel">Cancel</string>
+    <string name="disable_charge_alarm">Disable</string>
+    <string name="update">Update</string>
+    <string name="enable_charge_alarm">Set up</string>
+    <string name="battery_charged">Battery charged!</string>
+    <string name="battery_charged_description">You can now unplug the device.</string>
 </resources>

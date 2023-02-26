@@ -1,8 +1,6 @@
 package cz.bornasp.charging.service
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -14,18 +12,26 @@ import android.os.BatteryManager
 import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import cz.bornasp.charging.R
+import cz.bornasp.charging.broadcasts.ChargeAlarm
 import cz.bornasp.charging.data.AppDataContainer
 import cz.bornasp.charging.data.BatteryChargingSession
+import cz.bornasp.charging.helpers.ALARM_NOTIFICATION_ID
+import cz.bornasp.charging.helpers.SERVICE_NOTIFICATION_CHANNEL
+import cz.bornasp.charging.helpers.SERVICE_NOTIFICATION_ID
+import cz.bornasp.charging.helpers.createNotificationChannel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.time.OffsetDateTime
 
 const val TO_PERCENTAGE = 100
+private const val BATTERY_UNPLUGGED = 0
 private const val TAG = "ChargeMonitor"
-private const val SERVICE_NOTIFICATION_CHANNEL = "charge-monitor"
 
 class ChargeMonitor : Service() {
     private lateinit var powerBroadcastReceiver: PowerBroadcastReceiver
@@ -51,7 +57,7 @@ class ChargeMonitor : Service() {
             .setContentText(getString(R.string.charge_monitor_notification_text))
             .setContentIntent(pendingIntent)
             .build()
-        startForeground(startId, notification)
+        startForeground(SERVICE_NOTIFICATION_ID, notification)
 
         return START_STICKY
     }
@@ -60,7 +66,7 @@ class ChargeMonitor : Service() {
         super.onCreate()
         Log.d(TAG, "Service created")
 
-        createNotificationChannel()
+        createNotificationChannel(this)
         registerBroadcastReceiver()
     }
 
@@ -68,22 +74,6 @@ class ChargeMonitor : Service() {
         unregisterReceiver(powerBroadcastReceiver)
         super.onDestroy()
         Log.d(TAG, "Service destroyed")
-    }
-
-    /**
-     * Ensure that the channel of foreground service's mandatory notification exists.
-     */
-    private fun createNotificationChannel() {
-        val serviceChannel = NotificationChannel(
-            SERVICE_NOTIFICATION_CHANNEL,
-            getString(R.string.service_channel_name),
-            NotificationManager.IMPORTANCE_LOW
-        ).apply {
-            description = getString(R.string.service_channel_description)
-            setShowBadge(false)
-        }
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(serviceChannel)
     }
 
     /**
@@ -97,12 +87,14 @@ class ChargeMonitor : Service() {
             ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
             registerReceiver(powerBroadcastReceiver, ifilter)
         }
+        powerBroadcastReceiver.onReceive(this, null)
     }
 }
 
 private class PowerBroadcastReceiver : BroadcastReceiver() {
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob())
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(context: Context, intent: Intent?) {
         val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
             context.registerReceiver(null, ifilter)
         }
@@ -112,20 +104,63 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
             level * TO_PERCENTAGE / scale.toFloat()
         }
 
-        runBlocking {
-            launch {
-                when (intent.action) {
-                    Intent.ACTION_POWER_CONNECTED -> createSession(context, batteryPercentage)
-                    Intent.ACTION_POWER_DISCONNECTED -> endSession(context, batteryPercentage)
+        coroutineScope.launch {
+            when (intent?.action) {
+                Intent.ACTION_POWER_CONNECTED -> {
+                    createSession(context, batteryPercentage)
+                    registerChargeAlarm(context)
+                }
+                Intent.ACTION_POWER_DISCONNECTED -> {
+                    endSession(context, batteryPercentage)
+                    // Cancel the charge alarm if triggered
+                    with(NotificationManagerCompat.from(context)) {
+                        cancel(ALARM_NOTIFICATION_ID)
+                    }
+                    // Receiving broadcasts for the charge alarm will only drain battery
+                    unregisterChargeAlarm(context)
+                }
+                else -> {
+                    // Try to register the charge alarm in a situation when the intent
+                    // ACTION_POWER_CONNECTED was missed (i.e. after reboot)
+                    val chargePlug: Int = batteryStatus?.getIntExtra(
+                        BatteryManager.EXTRA_PLUGGED,
+                        BATTERY_UNPLUGGED
+                    ) ?: BATTERY_UNPLUGGED
+                    Log.d(TAG, "chargePlug = $chargePlug")
+                    if (chargePlug != BATTERY_UNPLUGGED) {
+                        registerChargeAlarm(context)
+                    }
                 }
             }
         }
-        Log.d(TAG, "Action: ${intent.action} ($batteryPercentage%}")
+        Log.d(TAG, "Action: ${intent?.action} ($batteryPercentage%)")
     }
 
-    private suspend fun createSession(context: Context, batteryPercentage: Float?) {
-        val repository = AppDataContainer(context).batteryChargingSessionRepository
+    /**
+     * Register [ChargeAlarm] as a broadcast receiver.
+     */
+    private fun registerChargeAlarm(context: Context) {
+        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+            context.registerReceiver(chargeAlarm, ifilter)
+        }
+    }
+
+    /**
+     * Unregister [ChargeAlarm] as a broadcast receiver.
+     *
+     * The charge alarm doesn't have to be registered, this method catches possible exception.
+     */
+    private fun unregisterChargeAlarm(context: Context) {
+        try {
+            context.unregisterReceiver(chargeAlarm)
+        } catch (e: IllegalArgumentException) {
+            Log.d(TAG, "Could not unregister receiver: $e")
+        }
+    }
+
+    private suspend fun createSession(context: Context, batteryPercentage: Float?) =
         withContext(Dispatchers.IO) {
+            val repository = AppDataContainer(context).batteryChargingSessionRepository
             repository.insertRecord(
                 BatteryChargingSession(
                     startTime = OffsetDateTime.now(),
@@ -133,12 +168,11 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
                 )
             )
         }
-    }
 
-    private suspend fun endSession(context: Context, batteryPercentage: Float?) {
-        val repository = AppDataContainer(context).batteryChargingSessionRepository
+    private suspend fun endSession(context: Context, batteryPercentage: Float?) =
         withContext(Dispatchers.IO) {
-            val session = repository.getLastRecord()
+            val repository = AppDataContainer(context).batteryChargingSessionRepository
+            val session = repository.getLastRecordStream().first()
             if (session == null || session.endTime != null) {
                 // We missed current session's start
                 repository.insertRecord(
@@ -156,5 +190,8 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
                 )
             }
         }
+
+    companion object {
+        val chargeAlarm = ChargeAlarm()
     }
 }
