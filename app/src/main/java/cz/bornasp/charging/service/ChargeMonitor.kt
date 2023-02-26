@@ -27,6 +27,7 @@ import kotlinx.coroutines.runBlocking
 import java.time.OffsetDateTime
 
 const val TO_PERCENTAGE = 100
+private const val BATTERY_UNPLUGGED = 0
 private const val TAG = "ChargeMonitor"
 
 class ChargeMonitor : Service() {
@@ -83,12 +84,13 @@ class ChargeMonitor : Service() {
             ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
             registerReceiver(powerBroadcastReceiver, ifilter)
         }
+        powerBroadcastReceiver.onReceive(this, null)
     }
 }
 
 private class PowerBroadcastReceiver : BroadcastReceiver() {
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(context: Context, intent: Intent?) {
         val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
             context.registerReceiver(null, ifilter)
         }
@@ -100,12 +102,10 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
 
         runBlocking {
             launch {
-                when (intent.action) {
+                when (intent?.action) {
                     Intent.ACTION_POWER_CONNECTED -> {
                         createSession(context, batteryPercentage)
-                        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
-                            context.registerReceiver(chargeAlarm, ifilter)
-                        }
+                        registerChargeAlarm(context)
                     }
                     Intent.ACTION_POWER_DISCONNECTED -> {
                         endSession(context, batteryPercentage)
@@ -113,16 +113,47 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
                         with(NotificationManagerCompat.from(context)) {
                             cancel(ALARM_NOTIFICATION_ID)
                         }
-                        try {
-                            context.unregisterReceiver(chargeAlarm)
-                        } catch (e: IllegalArgumentException) {
-                            Log.d(TAG, "Could not unregister receiver: $e")
+                        // Receiving broadcasts for the charge alarm will only drain battery
+                        unregisterChargeAlarm(context)
+                    }
+                    else -> {
+                        // Try to register the charge alarm in a situation when the intent
+                        // ACTION_POWER_CONNECTED was missed (i.e. after reboot)
+                        val chargePlug: Int = batteryStatus?.getIntExtra(
+                            BatteryManager.EXTRA_PLUGGED,
+                            BATTERY_UNPLUGGED
+                        ) ?: BATTERY_UNPLUGGED
+                        Log.d(TAG, "chargePlug = $chargePlug")
+                        if (chargePlug != BATTERY_UNPLUGGED) {
+                            registerChargeAlarm(context)
                         }
                     }
                 }
             }
         }
-        Log.d(TAG, "Action: ${intent.action} ($batteryPercentage%)")
+        Log.d(TAG, "Action: ${intent?.action} ($batteryPercentage%)")
+    }
+
+    /**
+     * Register [ChargeAlarm] as a broadcast receiver.
+     */
+    private fun registerChargeAlarm(context: Context) {
+        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+            context.registerReceiver(chargeAlarm, ifilter)
+        }
+    }
+
+    /**
+     * Unregister [ChargeAlarm] as a broadcast receiver.
+     *
+     * The charge alarm doesn't have to be registered, this method catches possible exception.
+     */
+    private fun unregisterChargeAlarm(context: Context) {
+        try {
+            context.unregisterReceiver(chargeAlarm)
+        } catch (e: IllegalArgumentException) {
+            Log.d(TAG, "Could not unregister receiver: $e")
+        }
     }
 
     private suspend fun createSession(context: Context, batteryPercentage: Float?) {
