@@ -18,6 +18,8 @@
     <string name="alarm_channel_description">Oznámení, že jste dosáhli vybrané úrovně nabití. Potřeba pouze pokud je alarm nabíjení zapnutý.</string>
     <string name="statistics">Statistiky</string>
     <string name="refresh">Znovu načíst</string>
+    <string name="time_seconds">%d\u2009s</string>
+    <string name="time_less_than_a_minute">méně než 1 min</string>
     <string name="arrow_forward_description">až</string>
     <string name="unknown_value">neznámé</string>
     <string name="charging_session_count">Počet nabíjení</string>
