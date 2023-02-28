@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="app/src/main/ic_launcher.svg" alt="app icon">
+  <img src="assets/ic_launcher.svg" alt="app icon">
   <h1>Charging</h1>
 </div>
 
@@ -18,6 +18,21 @@ comes from Material icons and is available under the
 - provides edge-to-edge experience
 - supports per-app language preferences
 - checked by Detekt and lint
+
+## Screenshots
+
+<table>
+  <tbody>
+    <tr>
+      <td><img src="assets/screenshots/discharging.png" alt="Home screen when discharging" /></td>
+      <td><img src="assets/screenshots/charging.png" alt="Home screen when charging" /></td>
+      <td><img src="assets/screenshots/history.png" alt="Screen with charging history" /></td>
+    </tr>
+    <tr>
+      <td><img src="assets/screenshots/statistics.png" alt="Charging statistics" /></td>
+      <td><img src="assets/screenshots/charge_alarm.png" alt="Charge alarm" /></td>
+    </tr>
+</table>
 
 ## Known issues
 
