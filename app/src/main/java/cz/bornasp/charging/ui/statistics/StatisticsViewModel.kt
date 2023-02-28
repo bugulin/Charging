@@ -1,5 +1,8 @@
 package cz.bornasp.charging.ui.statistics
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cz.bornasp.charging.data.BatteryChargingSessionRepository
@@ -19,15 +22,20 @@ class StatisticsViewModel(
     private val _uiState = MutableStateFlow(ChargingStatistics())
     val uiState: StateFlow<ChargingStatistics> = _uiState.asStateFlow()
 
+    var reloading by mutableStateOf(false)
+        private set
+
     init {
-        refresh()
+        reload()
     }
 
-    fun refresh() {
+    fun reload() {
         viewModelScope.launch {
+            reloading = true
             _uiState.update {
                 sessionRepository.getChargingStatistics()
             }
+            reloading = false
         }
     }
 }

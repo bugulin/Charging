@@ -12,7 +12,8 @@
     <string name="time_days_hours" translatable="false">%1$d\u2009d %2$d\u2009h</string>
     <string name="time_hours_minutes" translatable="false">%1$d\u2009h %2$d\u2009min</string>
     <string name="time_minutes">%d\u2009min</string>
-    <string name="time_seconds" translatable="false">%d\u2009s</string>
+    <string name="time_seconds">%d\u2009s</string>
+    <string name="time_less_than_a_minute">less than a minute</string>
     <string name="arrow_forward_description">to</string>
 
     <string name="charging">Charging</string>

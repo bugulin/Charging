@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +36,7 @@ import cz.bornasp.charging.R
 import cz.bornasp.charging.data.ChargingStatistics
 import cz.bornasp.charging.ui.AppViewModelProvider
 import cz.bornasp.charging.ui.components.Overline
+import cz.bornasp.charging.ui.components.ReloadButton
 import cz.bornasp.charging.ui.components.formatDuration
 import cz.bornasp.charging.ui.navigation.NavigationDestination
 import cz.bornasp.charging.ui.theme.AppIcons
@@ -76,12 +76,10 @@ fun StatisticsScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(
-                            imageVector = AppIcons.Refresh,
-                            contentDescription = stringResource(R.string.refresh)
-                        )
-                    }
+                    ReloadButton(
+                        reloading = viewModel.reloading,
+                        onClick = { viewModel.reload() }
+                    )
                 },
                 scrollBehavior = scrollBehavior
             )

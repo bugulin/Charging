@@ -21,13 +21,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.whenStarted
 import cz.bornasp.charging.R
 import cz.bornasp.charging.data.BatteryChargingSession
 import cz.bornasp.charging.ui.AppViewModelProvider
@@ -37,7 +40,13 @@ import cz.bornasp.charging.ui.components.formatDuration
 import cz.bornasp.charging.ui.navigation.NavigationDestination
 import cz.bornasp.charging.ui.theme.AppIcons
 import cz.bornasp.charging.ui.theme.ChargingTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.time.OffsetDateTime
+
+/** Last event message update interval in seconds. */
+private const val UPDATE_INTERVAL = 20_000L
 
 object HomeDestination : NavigationDestination {
     override val route = "home"
@@ -131,7 +140,7 @@ fun HomeScreenContent(
         )
         Text(
             text = message ?: "",
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 24.dp),
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -154,20 +163,43 @@ fun HomeScreenPreview() {
     }
 }
 
+/**
+ * Get informative message about the last charging event (plugged in/out).
+ *
+ * This [Composable] returns a string that contains current time since the last event and
+ * automatically updates it every [UPDATE_INTERVAL] seconds.
+ */
 @Composable
 private fun getLastEventMessage(lastCharging: BatteryChargingSession?): String? {
-    val now = OffsetDateTime.now()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val now by produceState<OffsetDateTime>(initialValue = OffsetDateTime.now()) {
+        withContext(Dispatchers.Default) {
+            lifecycleOwner.whenStarted {
+                while (true) {
+                    value = OffsetDateTime.now()
+                    delay(UPDATE_INTERVAL)
+                }
+            }
+        }
+    }
+
     var message: String? = null
     if (lastCharging != null) {
         if (lastCharging.endTime != null) {
             message = stringResource(
                 R.string.time_from_last_charging,
-                formatDuration(now.toEpochSecond() - lastCharging.endTime.toEpochSecond())
+                formatDuration(
+                    seconds = now.toEpochSecond() - lastCharging.endTime.toEpochSecond(),
+                    precise = false
+                )
             )
         } else if (lastCharging.startTime != null) {
             message = stringResource(
                 R.string.current_charging_time,
-                formatDuration(now.toEpochSecond() - lastCharging.startTime.toEpochSecond())
+                formatDuration(
+                    seconds = now.toEpochSecond() - lastCharging.startTime.toEpochSecond(),
+                    precise = false
+                )
             )
         }
     }

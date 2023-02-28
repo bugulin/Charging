@@ -72,11 +72,11 @@ fun PercentageDifferenceText(value: Float, style: TextStyle, modifier: Modifier 
 }
 
 /**
- * Custom time formatting.
- * @param seconds Duration in seconds.
+ * Format time in [seconds] as a duration.
+ * @param precise Whether to show precise number of seconds.
  */
 @Composable
-fun formatDuration(seconds: Long): String {
+fun formatDuration(seconds: Long, precise: Boolean = true): String {
     val minutes = seconds / SECONDS_IN_MINUTE
     val hours = minutes / MINUTES_IN_HOUR
     val days = hours / HOURS_IN_DAY
@@ -85,6 +85,10 @@ fun formatDuration(seconds: Long): String {
         days != 0L -> stringResource(R.string.time_days_hours, days, hours % HOURS_IN_DAY)
         hours != 0L -> stringResource(R.string.time_hours_minutes, hours, minutes % MINUTES_IN_HOUR)
         minutes != 0L -> stringResource(R.string.time_minutes, minutes)
-        else -> stringResource(R.string.time_seconds, seconds)
+        else -> if (precise) {
+            stringResource(R.string.time_seconds, seconds)
+        } else {
+            stringResource(R.string.time_less_than_a_minute)
+        }
     }
 }
