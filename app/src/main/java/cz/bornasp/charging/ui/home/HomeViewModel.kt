@@ -16,6 +16,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
+/** What battery percentage to display when actual value is not available. */
+private const val DEFAULT_BATTERY_PERCENTAGE = 0f
+
 /**
  * View model with current battery status and all battery charging sessions in the database.
  */
@@ -47,11 +50,11 @@ class HomeViewModel(
      * @param batteryStatus Intent that matches [Intent.ACTION_BATTERY_CHANGED].
      */
     fun update(batteryStatus: Intent?) {
-        val chargePlug: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+        val chargePlug: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0
         val percentage: Float? = batteryStatus?.let { intent ->
             val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
             val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            level * TO_PERCENTAGE / scale.toFloat()
+            if (level == -1 || scale == -1) null else level * TO_PERCENTAGE / scale.toFloat()
         }
         val status = batteryStatus?.getIntExtra(
             BatteryManager.EXTRA_STATUS,
@@ -59,7 +62,7 @@ class HomeViewModel(
         ) ?: BatteryManager.BATTERY_STATUS_UNKNOWN
         _uiState.update { currentState ->
             currentState.copy(
-                batteryPercentage = percentage ?: -1f,
+                batteryPercentage = percentage ?: DEFAULT_BATTERY_PERCENTAGE,
                 batteryStatus = status,
                 isPluggedIn = chargePlug != 0
             )
@@ -75,7 +78,7 @@ class HomeViewModel(
  * UI state for home screen.
  */
 data class HomeUiState(
-    val batteryPercentage: Float = -1F,
+    val batteryPercentage: Float = DEFAULT_BATTERY_PERCENTAGE,
     val batteryStatus: Int = BatteryManager.BATTERY_STATUS_UNKNOWN,
     val isPluggedIn: Boolean = false,
 )

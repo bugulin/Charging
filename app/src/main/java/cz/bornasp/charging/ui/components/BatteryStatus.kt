@@ -1,5 +1,8 @@
 package cz.bornasp.charging.ui.components
 
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,19 +24,26 @@ import cz.bornasp.charging.R
 import cz.bornasp.charging.ui.theme.AppIcons
 import cz.bornasp.charging.ui.theme.ChargingTheme
 
+/** Duration of battery percentage animation. */
+private const val ANIMATION_DURATION = 250
+
 @Composable
 fun BatteryStatus(
     percentage: Float,
     power: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val animatedPercentage by animateFloatAsState(
+        targetValue = percentage,
+        animationSpec = tween(durationMillis = ANIMATION_DURATION, easing = LinearOutSlowInEasing)
+    )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier
     ) {
         Text(
-            text = stringResource(R.string.percentage, percentage),
+            text = stringResource(R.string.percentage, animatedPercentage),
             style = MaterialTheme.typography.displayLarge
         )
         Box(
