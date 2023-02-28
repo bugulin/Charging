@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -137,11 +137,11 @@ fun BatteryChargingSessionList(
             modifier = modifier,
             contentPadding = contentPadding
         ) {
-            items(items = sessionList, key = { it.id }) { record ->
+            itemsIndexed(items = sessionList, key = { _, item -> item.id }) { index, record ->
                 Box(
                     modifier = Modifier.padding(
                         start = 8.dp,
-                        top = 0.dp,
+                        top = if (index == 0) 8.dp else 0.dp,
                         end = 8.dp,
                         bottom = 8.dp
                     )
