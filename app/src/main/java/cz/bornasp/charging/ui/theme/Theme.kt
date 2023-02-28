@@ -103,7 +103,7 @@ fun ChargingTheme(
         SideEffect {
             val window = (view.context as Activity).window
             val insets = WindowCompat.getInsetsController(window, view)
-            window.statusBarColor = colorScheme.background.toArgb()
+            window.statusBarColor = Color.Transparent.toArgb()
             window.navigationBarColor = Color.Transparent.toArgb()
             insets.isAppearanceLightStatusBars = !darkTheme
             insets.isAppearanceLightNavigationBars = !darkTheme
