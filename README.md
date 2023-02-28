@@ -4,7 +4,8 @@
 </div>
 
 An Android application for monitoring your battery status and charging habits.
-Written in Kotlin, built with Jetpack Compose.
+Written in Kotlin, built with Jetpack Compose. The application allows you to
+see how you've been charging your device and to set up a charge alarm.
 
 The
 [charge alarm notification icon](app/src/main/res/drawable-anydpi/notification_charge_alarm.xml)
@@ -39,6 +40,8 @@ comes from Material icons and is available under the
 - The application uses many experimental APIs of Compose Material 3.
 - Jetpack Compose renders a level smaller UI (e.g. Headline Medium in Large top
   app bar looks like Headline Small).
+- The charging history screen hasn't been tested out with larger number of
+  items. Probably use of some pager will be appropriate.
 
 <sup>This project was created as a credit program for the
 [Mobile Devices Programming](https://d3s.mff.cuni.cz/teaching/nprg056/)
