@@ -43,7 +43,7 @@ class ChargeAlarm : BroadcastReceiver() {
         val information = container.userPreferencesRepository.chargeAlarmInformation.first()
         Log.d(TAG, "Charge: $batteryCharge / ${information.targetCharge}")
 
-        if (batteryCharge >= information.targetCharge) {
+        if (batteryCharge >= information.targetCharge && information.isEnabled) {
             if (!information.wentOff) {
                 // Set the alarm off
                 container.userPreferencesRepository.setChargeAlarmWentOff(true)
