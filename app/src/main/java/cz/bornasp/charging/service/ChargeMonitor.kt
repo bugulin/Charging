@@ -87,25 +87,27 @@ class ChargeMonitor : Service() {
             ifilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
             registerReceiver(powerBroadcastReceiver, ifilter)
         }
-        powerBroadcastReceiver.onReceive(this, null)
+        powerBroadcastReceiver.check(this)
     }
 }
 
 private class PowerBroadcastReceiver : BroadcastReceiver() {
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob())
 
-    override fun onReceive(context: Context, intent: Intent?) {
-        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
-            context.registerReceiver(null, ifilter)
-        }
-        val batteryPercentage: Float? = batteryStatus?.let {
-            val level: Int = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale: Int = it.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            level * TO_PERCENTAGE / scale.toFloat()
-        }
-
+    override fun onReceive(context: Context, intent: Intent) {
+        val pendingResult: PendingResult = goAsync()
         coroutineScope.launch {
-            when (intent?.action) {
+            val batteryStatus: Intent? =
+                IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                    context.registerReceiver(null, ifilter)
+                }
+            val batteryPercentage: Float? = batteryStatus?.let {
+                val level: Int = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                val scale: Int = it.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                level * TO_PERCENTAGE / scale.toFloat()
+            }
+
+            when (intent.action) {
                 Intent.ACTION_POWER_CONNECTED -> {
                     createSession(context, batteryPercentage)
                     registerChargeAlarm(context)
@@ -119,27 +121,40 @@ private class PowerBroadcastReceiver : BroadcastReceiver() {
                     // Receiving broadcasts for the charge alarm will only drain battery
                     unregisterChargeAlarm(context)
                 }
-                else -> {
-                    // Try to register the charge alarm in a situation when the intent
-                    // ACTION_POWER_CONNECTED was missed (i.e. after reboot)
-                    val chargePlug: Int = batteryStatus?.getIntExtra(
-                        BatteryManager.EXTRA_PLUGGED,
-                        BATTERY_UNPLUGGED
-                    ) ?: BATTERY_UNPLUGGED
-                    Log.d(TAG, "chargePlug = $chargePlug")
-                    if (chargePlug != BATTERY_UNPLUGGED) {
-                        registerChargeAlarm(context)
-                    }
+            }
+            Log.d(TAG, "Action: ${intent.action} ($batteryPercentage%)")
+            pendingResult.finish()
+        }
+    }
+
+    /**
+     * Check current situation and possibly recover the [ChargeAlarm] receiver.
+     */
+    fun check(context: Context) {
+        coroutineScope.launch {
+            val batteryStatus: Intent? =
+                IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                    context.registerReceiver(null, ifilter)
                 }
+
+            // Try to register the charge alarm in a situation when the intent
+            // ACTION_POWER_CONNECTED was missed (i.e. after reboot)
+            val chargePlug: Int =
+                batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, BATTERY_UNPLUGGED)
+                    ?: BATTERY_UNPLUGGED
+            if (chargePlug != BATTERY_UNPLUGGED) {
+                // Reset the charge alarm and its notification
+                AppDataContainer(context).userPreferencesRepository.setChargeAlarmWentOff(false)
+                registerChargeAlarm(context)
             }
         }
-        Log.d(TAG, "Action: ${intent?.action} ($batteryPercentage%)")
     }
 
     /**
      * Register [ChargeAlarm] as a broadcast receiver.
      */
     private fun registerChargeAlarm(context: Context) {
+        Log.d(TAG, "Registering Charge Alarm")
         IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
             context.registerReceiver(chargeAlarm, ifilter)
         }
